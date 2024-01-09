@@ -1,0 +1,38 @@
+title: '&0草稿箱'
+layout:
+  - '         '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - '         '
+  - '<   C   >'
+
+#
+# 不要修改 "C、@、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '@':
+    display:
+      mats: BOOK
+      name: '&7主题: &f[title]'
+      lore:
+        - ''
+        - ' &7邮件内容:'
+        - ' [text]'
+        - ''
+        - '&8[&a点击&8] &7# 继续修改'
+  B:
+    display:
+      mats: APPLE
+      name: '&3# &e继续创建'
+  '<':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &b跳转至'
+      lore:
+        - '&7上一页'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &b跳转至'
+      lore:
+        - '&7下一页'

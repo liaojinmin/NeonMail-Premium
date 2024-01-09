@@ -1,0 +1,28 @@
+title: '&0物品预览'
+layout:
+  - '         '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - '         '
+  - '<   B   >'
+#
+# 不要修改 "@、B、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &b跳转至'
+      lore:
+        - '&7上一页'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &b跳转至'
+      lore:
+        - '&7下一页'
+  'B':
+    display:
+      mats: BARRIER
+      name: '&3# &a返回'

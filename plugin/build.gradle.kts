@@ -4,12 +4,15 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
+
 val taboolibVersion: String by project
 val kotlinVersionNum: String
     get() = project.kotlin.coreLibrariesVersion.replace(".", "")
 
 dependencies {
-    implementation(project(":project:common"))
+    implementation(project(":project:module-api"))
+    implementation(project(":project:module-common"))
+    implementation(project(":project:module-menu"))
     implementation(project(":project:module-bukkit"))
 }
 
@@ -37,8 +40,6 @@ tasks {
         // redis
         relocate("redis.clients", "${rootProject.group}.libs.redis.clients")
 
-        // snappy
-        relocate("org.xerial.snappy", "${rootProject.group}.libs.xerial.snappy")
 
     }
     sourcesJar  {

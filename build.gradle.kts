@@ -34,18 +34,15 @@ subprojects {
 
         // 引入 Taboolib
         compileOnly("io.izzel.taboolib:common:$taboolibVersion")
-        implementation("io.izzel.taboolib:common-5:$taboolibVersion")
 
+        implementation("io.izzel.taboolib:common-5:$taboolibVersion")
         implementation("io.izzel.taboolib:module-chat:$taboolibVersion")
         implementation("io.izzel.taboolib:module-configuration:$taboolibVersion")
         implementation("io.izzel.taboolib:module-lang:$taboolibVersion")
-
         implementation("io.izzel.taboolib:module-nms:$taboolibVersion")
         implementation("io.izzel.taboolib:module-nms-util:$taboolibVersion")
         implementation("io.izzel.taboolib:module-ui:$taboolibVersion")
-
         implementation("io.izzel.taboolib:module-kether:$taboolibVersion")
-
         implementation("io.izzel.taboolib:module-metrics:$taboolibVersion")
         implementation("io.izzel.taboolib:platform-bukkit:$taboolibVersion")
 
@@ -57,7 +54,7 @@ subprojects {
 
 
         // server
-      //  compileOnly("ink.ptms.core:v11604:11604")
+        compileOnly("ink.ptms.core:v11604:11604")
 
     }
     java {

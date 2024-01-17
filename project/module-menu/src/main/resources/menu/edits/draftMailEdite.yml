@@ -1,0 +1,73 @@
+title: '&0发送邮件'
+layout:
+  - '         '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - '   1 2   '
+  - '< B S G >'
+
+#
+# 不要修改 "B、S、G、1、2、@、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  1:
+    display:
+      mats: BOOK
+      name: '&7主题:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[title]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  2:
+    display:
+      mats: BOOK
+      name: '&7内容:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[text]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  '@':
+    display:
+      mats: BOOK
+      name: '&7收件人信息:'
+      lore:
+        - ''
+        - ' &7目标玩家: &f[player]'
+        - ' &7附件:'
+        - ' &f[info]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+      subIcon:
+        mats: BARRIER
+        name: '&e添加收件人'
+        lore:
+          - ''
+          - '&8[&a点击&8] &7# 添加一个'
+  B:
+    display:
+      mats: APPLE
+      name: '&3# &c删除'
+  S:
+    display:
+      mats: ender_chest
+      name: '&3# &b保存为草稿'
+  G:
+    display:
+      mats: END_PORTAL_FRAME
+      name: '&3# &a发送'
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &b跳转至'
+      lore:
+        - '&7上一页'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &b跳转至'
+      lore:
+        - '&7下一页'

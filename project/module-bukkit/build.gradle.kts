@@ -6,17 +6,16 @@ plugins {
 
 dependencies {
     // 引入 API
-    compileOnly(project(":project:common"))
-    compileOnly("ink.ptms.core:v11604:11604")
-    compileOnly("ink.ptms.core:v11701:11701-minimize:mapped")
-    compileOnly("ink.ptms.core:v11701:11701-minimize:universal")
+    compileOnly(project(":project:module-common"))
+    compileOnly(project(":project:module-api"))
+    compileOnly(project(":project:module-menu"))
 }
 
 taboolib {
     description {
         name(rootProject.name)
         contributors {
-            name("HSDLao_liao")
+            name("老廖")
         }
         dependencies {
             bukkitApi("1.13")

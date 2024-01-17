@@ -7,5 +7,7 @@
 rootProject.name = "NeonMail-Premium"
 
 include("plugin")
-include("project:common")
+include("project:module-api")
+include("project:module-common")
+include("project:module-menu")
 include("project:module-bukkit")

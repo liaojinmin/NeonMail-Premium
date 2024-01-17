@@ -1,0 +1,69 @@
+title: '&0编辑附件'
+layout:
+  - '    P    '
+  - ' 1 2 3 4 '
+  - 'B        '
+
+#
+# 不要修改 "B、1、2、3、4、P" 字符，这些字符已内定，如果要增加图标请使用其它字符
+# Do not modify the characters 'B, 1, 2, 3, P, 4';
+# these characters are predefined. If you want to add icons, please use other characters.
+#
+icons:
+  1:
+    display:
+      mats: BOOK
+      name: '&7金币:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[money]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  2:
+    display:
+      mats: BOOK
+      name: '&7点券:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[points]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+
+
+  # 注意: 该附件类型仅管理员可见
+  # Note: This attachment type is visible only to administrators.
+  # perm: mail.edit.admin
+  3:
+    display:
+      mats: BOOK
+      name: '&7自定义指令:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[command]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  4:
+    display:
+      mats: BOOK
+      name: '&7物品:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[itemStacks]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  P:
+    display:
+      mats: PLAYER_HEAD # IF ERR USE HEAD
+      name: '&7玩家:'
+      lore:
+        - ''
+        - '  &7当前目标: &f[player]'
+        - ''
+  B:
+    display:
+      mats: IRON_DOOR
+      name: '&3# &a返回'

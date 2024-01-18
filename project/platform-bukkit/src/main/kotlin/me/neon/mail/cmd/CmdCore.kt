@@ -1,6 +1,8 @@
 package me.neon.mail.cmd
 
 
+import me.neon.mail.menu.CmdAdminMenu
+import me.neon.mail.menu.CmdMenu
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.command.*
 import taboolib.common.platform.function.adaptCommandSender
@@ -27,7 +29,10 @@ object CmdCore {
     }
 
     @CommandBody(permission = "neonMail.command.box")
-    val box = CmdBox.command
+    val box = CmdMenu.command
+
+    @CommandBody(permission = "neonMail.command.box.admin")
+    val adminBox = CmdAdminMenu.command
 
 
     private fun createHelp(sender: CommandSender) {

@@ -1,5 +1,6 @@
 package me.neon.mail.menu.edit
 
+import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMailRegister
 import me.neon.mail.service.ServiceManager.deleteToSql
 import me.neon.mail.service.ServiceManager.updateToSql
@@ -29,14 +30,15 @@ import java.util.UUID
 class DraftMailEditeMenu(
     override val player: Player,
     private val data: PlayerData,
-    private val mail: MailDraftBuilder
-): DraftEdite {
+    private val mail: MailDraftBuilder,
+    override val admin: Boolean = false
+): IDraftEdite {
 
     private val menuData: MenuData = MenuLoader.draftMailEditeMenu
 
 
     override fun getInventory(): Inventory {
-        return buildMenu<Linked<Pair<UUID, IMailDataType>>>(
+        return buildMenu<Linked<Pair<UUID?, IMailDataType>>>(
             menuData.title.replacePlaceholder(player)
         ) {
             map(*menuData.layout)
@@ -46,23 +48,25 @@ class DraftMailEditeMenu(
             slots(menuData.getCharSlotIndex('@'))
 
             elements {
-                val list = mutableListOf<Pair<UUID, IMailDataType>>()
-                mail.targets.forEach { (t, u) ->
+                val list = mutableListOf<Pair<UUID?, IMailDataType>>()
+                mail.getTargets().forEach { (t, u) ->
                     list.add(t to u)
                 }
-                list.add(IMailRegister.console to DataTypeEmpty())
+                list.add(null to DataTypeEmpty())
                 list
             }
 
             onGenerate { _, element, _, _ ->
                 var icon = menuData.getCharMenuIcon('@')
-                if (element.first == IMailRegister.console) {
+                var parseItem = true
+                if (element.first == null && element.second is DataTypeEmpty) {
                     icon = icon.subIcon ?: error("找不到子图标")
+                    parseItem = false
                 }
                 val itemBuilder = ItemBuilder(icon.mats)
                 itemBuilder.name = icon.name.replacePlaceholder(player)
                 itemBuilder.customModelData = icon.model
-                if (element.first != IMailRegister.console) {
+                if (parseItem) {
                     icon.lore.forEach {
                         if (it.contains("[info]")) {
                             // 取空格
@@ -75,7 +79,16 @@ class DraftMailEditeMenu(
                                 element.second.getAppendixInfo(adaptPlayer(player), str.toString(), true).split(";")
                             )
                         } else {
-                            itemBuilder.lore.add(it.replace("[player]", Bukkit.getOfflinePlayer(element.first).name ?: element.first.toString()))
+                            if (element.first == IMailRegister.console) {
+                                itemBuilder.lore.add(it.replace("[player]", "all"))
+                            } else {
+                                itemBuilder.lore.add(
+                                    it.replace(
+                                        "[player]",
+                                        Bukkit.getOfflinePlayer(element.first!!).name ?: element.first.toString()
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -83,12 +96,14 @@ class DraftMailEditeMenu(
             }
 
             onClick { _, element ->
-                if (element.first == IMailRegister.console) {
-                    PlayerListMenu(player, data, mail, this@DraftMailEditeMenu).openMenu()
+                // 如果已经是全体模式，拒绝再添加
+                if (!mail.checkGlobalModel() && element.first == IMailRegister.console) {
+                    PlayerListMenu(player, data, mail, this@DraftMailEditeMenu, admin).openMenu()
                 } else {
-                    // 操作界面
-                    // TODO("暂不考虑已编辑的附件删除")
-                    MailAppEditeMenu(player, data, mail, element.first, element.second, this@DraftMailEditeMenu).openMenu()
+                    element.first?.let {
+                        // 操作界面
+                        MailAppEditeMenu(player, data, mail, it, element.second, this@DraftMailEditeMenu, admin).openMenu()
+                    }
                 }
             }
 
@@ -103,11 +118,16 @@ class DraftMailEditeMenu(
                                     if (it.equals("cancel", ignoreCase = true)) {
                                         player.cancelNextChat(false)
                                     } else {
-                                        // TODO(未做输入检查)
-                                        mail.title = it
+                                        if (it.length >= 120) {
+                                            player.sendLang("邮件-编辑操作-输入长度超出", 120, it.length)
+                                        } else if (NeonMailLoader.checkInput(it)) {
+                                            player.sendLang("邮件-编辑操作-输入存在屏蔽词")
+                                        } else {
+                                            mail.title = it
+                                            submit { openMenu() }
+                                        }
                                     }
                                 }
-                                submit { openMenu() }
                             }
                             player.closeInventory()
                         }
@@ -120,12 +140,17 @@ class DraftMailEditeMenu(
                                     if (it.equals("cancel", ignoreCase = true)) {
                                         player.cancelNextChat(false)
                                     } else {
-                                        mail.context.clear()
-                                        // TODO(未做输入检查)
-                                        mail.context.addAll(it.split(";"))
+                                        if (it.length >= 255) {
+                                            player.sendLang("邮件-编辑操作-输入长度超出",255, it.length)
+                                        } else if (NeonMailLoader.checkInput(it)) {
+                                            player.sendLang("邮件-编辑操作-输入存在屏蔽词")
+                                        } else {
+                                            mail.context.clear()
+                                            mail.context.addAll(it.split(";"))
+                                            submit { openMenu() }
+                                        }
                                     }
                                 }
-                                submit { openMenu() }
                             }
                             player.closeInventory()
                         }

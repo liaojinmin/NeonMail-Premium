@@ -108,8 +108,6 @@ class ReceiveMenu(
                                             player.cancelNextChat(false)
                                         } else if (it == "确认" || it == "ok") {
                                             player.sendLang("邮件-删除操作-成功", list.size)
-                                            // 修改状态
-                                            list.forEach { mail -> mail.targetDel = 1 }
                                             // 更新
                                             list.deleteMails(false)
                                             // 清理

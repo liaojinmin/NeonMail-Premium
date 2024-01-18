@@ -13,6 +13,7 @@ import me.neon.mail.service.sql.*
 import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.function.warning
 import java.sql.Connection
+import java.sql.ResultSet
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -186,6 +187,9 @@ class SQLImpl {
         }
     }
 
+    /**
+     * 批量插入待实现
+     */
     fun insertMail(mail: IMail<*>) {
         getConnection {
             this.prepareStatement(
@@ -201,8 +205,9 @@ class SQLImpl {
                 it.setLong(8, mail.collectTimer)
                 it.setString(9, mail.mailType)
                 it.setBytes(10, IMailRegister.serializeMailData(mail))
-                it.setInt(11, mail.senderDel)
-                it.setInt(12, mail.targetDel)
+                // 如果发送者是系统，默认 1
+                it.setInt(11, if (mail.sender == IMailRegister.console) 1 else 0)
+                it.setInt(12, 0)
                 it.execute()
             }
         }
@@ -238,36 +243,28 @@ class SQLImpl {
         return back.get()
     }
 
-    @Deprecated("不确定是否使用")
-    fun updateMailsDel(mails: List<IMail<*>>, isSenderDel: Boolean) {
-        if (mails.isEmpty()) return
+
+    fun selectMail(uuid: UUID): IMail<*>? {
+        var mail: IMail<*>? = null
         getConnection {
-            if (isSenderDel) {
-                this.prepareStatement(
-                    "UPDATE $mailTAB SET `sd`=? WHERE `uuid`=? LIMIT 1"
-                ).action {
-                    mails.forEach { mail ->
-                        it.setInt(1, 1)
-                        it.setString(2, mail.uuid.toString())
-                        it.addBatch()
+            this.prepareStatement(
+                "SELECT `uuid`,`sender`,`target`,`title`,`context`,`state`,`senderTimer`,`collectTimer`,`type`,`td`,`sd`,`data` " +
+                "FROM $mailTAB WHERE `uuid`=? LIMIT 1"
+            ).action {
+                it.setUUID(1, uuid)
+                it.executeQuery().get { res ->
+                    if (res.next()) {
+                        if (res.getInt("sd") < 1 && res.getInt("td") < 1) {
+                            mail = res.getMailData()
+                        } else {
+                            warning("异常的邮件查询，这个邮件应当被标记删除 $uuid")
+                        }
                     }
-                    it.executeBatch()
-                }
-            } else {
-                this.prepareStatement(
-                    "UPDATE $mailTAB SET `td`=? WHERE `uuid`=? LIMIT 1"
-                ).action {
-                    mails.forEach { mail ->
-                        it.setInt(1, 1)
-                        it.setString(2, mail.uuid.toString())
-                        it.addBatch()
-                    }
-                    it.executeBatch()
                 }
             }
         }
+        return mail
     }
-
 
     /**
      * 此查询会返回收件箱、发件箱，两种状态邮件
@@ -296,42 +293,13 @@ class SQLImpl {
                 }
                 it.executeQuery().get { res ->
                     while (res.next()) {
-                        IMailRegister.getRegisterMail(res.getString("type"))?.let { mail ->
-                            val uuid = UUID.fromString(res.getString("uuid"))
-                            val sender = UUID.fromString(res.getString("sender"))
-                            val target = UUID.fromString(res.getString("target"))
-                            val data = IMailRegister.deserializeMailData(res.getBytes("data"), mail.getDataType())
-                            val mailObj = mail.cloneMail(uuid, sender, target, data)
-                            mailObj.title = res.getString("title")
-                            mailObj.context = res.getString("context")
-                            mailObj.state = IMailState.valueOf(res.getString("state"))
-                            mailObj.senderTimer = res.getLong("senderTimer")
-                            mailObj.collectTimer = res.getLong("collectTimer")
-                            // 发送者和接受者都是一个人
-                            // 特殊处理
-                            add(sender, target, res.getInt("sd"), res.getInt("td"), mailObj)
-                        } ?: error("未知邮件种类 -> ${res.getString("type")}")
+                        val mailObj = res.getMailData()
+                        add(mailObj.sender, mailObj.target, res.getInt("sd"), res.getInt("td"), mailObj)
                     }
                 }
             }
         }
         return s to t
-    }
-
-    fun insertDraft(edite: MailDraftBuilder) {
-        getConnection {
-            prepareStatement("INSERT INTO $draftTAB(`uuid`,`type`,`sender`,`title`,`context`,`data`) " +
-                    "VALUES(?, ?, ?, ?, ?, ?)"
-            ).action {
-                it.setString(1, edite.uuid.toString())
-                it.setString(2, edite.type)
-                it.setString(3, edite.sender.toString())
-                it.setString(4, edite.title)
-                it.setString(5, edite.context.joinToString(";"))
-                it.setBytes(6, MailDraftBuilder.serialize(edite.targets))
-                it.execute()
-            }
-        }
     }
 
 
@@ -375,14 +343,15 @@ class SQLImpl {
                 autoCommit = false
                 this.prepareStatement(
                     """
-                    INSERT INTO $draftTAB (`uuid`, `sender`, `type`, `title`, `context`, `data`)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO $draftTAB (`uuid`, `sender`, `type`, `title`, `context`,`global`, `data`)
+                    VALUES (?, ?, ?, ?, ?, ?,?)
                     ON DUPLICATE KEY UPDATE 
-                    `sender` = VALUES(sender), 
-                    `type` = VALUES(type), 
-                    `title` = VALUES(title), 
-                    `context` = VALUES(context), 
-                    `data` = VALUES(data);
+                    `sender` = VALUES(`sender`), 
+                    `type` = VALUES(`type`), 
+                    `title` = VALUES(`title`), 
+                    `context` = VALUES(`context`),
+                    `global` = VALUES(`global`),
+                    `data` = VALUES(`data`);
             """).action {
                     edite.forEach { draft ->
                         it.setUUID(1, draft.uuid)
@@ -390,7 +359,8 @@ class SQLImpl {
                         it.setString(3, draft.type)
                         it.setString(4, draft.title)
                         it.setStringList(5, draft.context)
-                        it.setBytes(6, MailDraftBuilder.serialize(draft.targets))
+                        it.setBoolean(6, draft.checkGlobalModel())
+                        it.setBytes(7, MailDraftBuilder.serialize(draft.getTargets()))
                         it.addBatch()
                     }
                     it.executeBatch()
@@ -409,7 +379,7 @@ class SQLImpl {
     fun selectDrafts(player: UUID, callBack: (MutableList<MailDraftBuilder>) -> Unit) {
         getConnection {
             this.prepareStatement(
-                "SELECT `uuid`,`type`,`title`,`context`,`data` FROM $draftTAB WHERE sender=? LIMIT 20"
+                TABStatement.SELECT_DRAFTS.statement
             ).action {
                 it.setUUID(1, player)
                 it.executeQuery().get { res ->
@@ -420,8 +390,9 @@ class SQLImpl {
                             val uuid = res.getUUID("uuid")
                             val title = res.getString("title")
                             val context = res.getStringList("context").toMutableList()
+                            val global = res.getBoolean("global")
                             val data = MailDraftBuilder.deserialize(res.getBytes("data"), im.getDataType())
-                            list.add(MailDraftBuilder(player, type, uuid, title, context, data))
+                            list.add(MailDraftBuilder(player, type, uuid, title, context, global, data))
                         } ?: warning("在获取草稿邮件时发生以外，邮件种类缺少 -> $type")
                     }
                     callBack.invoke(list)
@@ -434,7 +405,7 @@ class SQLImpl {
         if (dataSub.isActive) {
             getConnection {
                 prepareStatement(
-                    "INSERT INTO $userTAB(`uuid`,`user`,`mail`,`data`) VALUES(?,?,?,?)"
+                    TABStatement.INSERT_PLAYER_DATA.statement
                 ).action {
                     it.setUUID(1, data.uuid)
                     it.setString(2, data.user)
@@ -452,7 +423,7 @@ class SQLImpl {
         if (dataSub.isActive) {
             getConnection {
                 prepareStatement(
-                    "UPDATE $userTAB SET `user`=?, `mail`=?, `data`=? WHERE `uuid`=? LIMIT 1"
+                    TABStatement.UPDATE_PLAYER_DATA.statement
                 ).action {
                     it.setString(1, data.user)
                     it.setString(2, data.mail)
@@ -470,7 +441,7 @@ class SQLImpl {
         if (dataSub.isActive) {
             getConnection {
                 this.prepareStatement(
-                    "SELECT `mail`,`data` FROM $userTAB WHERE uuid=? LIMIT 1"
+                    TABStatement.SELECT_PLAYER_DATA.statement
                 ).action {
                     it.setString(1, player.uniqueId.toString())
                     val res = it.executeQuery()
@@ -488,6 +459,22 @@ class SQLImpl {
         } else {
             error("数据库连接异常")
         }
+    }
+
+    private fun ResultSet.getMailData(): IMail<*> {
+        return IMailRegister.getRegisterMail(this.getString("type"))?.let { mail ->
+            val uuid = UUID.fromString(this.getString("uuid"))
+            val sender = UUID.fromString(this.getString("sender"))
+            val target = UUID.fromString(this.getString("target"))
+            val data = IMailRegister.deserializeMailData(this.getBytes("data"), mail.getDataType())
+            val mailObj = mail.cloneMail(uuid, sender, target, data)
+            mailObj.title = this.getString("title")
+            mailObj.context = this.getString("context")
+            mailObj.state = IMailState.valueOf(this.getString("state"))
+            mailObj.senderTimer = this.getLong("senderTimer")
+            mailObj.collectTimer = this.getLong("collectTimer")
+            mailObj
+        } ?: error("未知邮件种类 -> ${this.getString("type")}")
     }
 
 

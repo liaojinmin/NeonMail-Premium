@@ -6,7 +6,7 @@ import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailState
 import me.neon.mail.common.PlayerData
 import me.neon.mail.menu.MenuLoader
-import me.neon.mail.common.IMailDefaultImpl
+import me.neon.mail.common.IMailNormalImpl
 import me.neon.mail.menu.MenuData
 import me.neon.mail.utils.parseMailInfo
 import org.bukkit.entity.Player
@@ -56,7 +56,7 @@ class ActionsMenu(
                         set(key, value.parseItems(player, mail.parseMailInfo(value.lore))) {
                             // 没有领取则允许打开
                             if (mail.state == IMailState.NotObtained) {
-                                if (mail is IMailDefaultImpl && mail.data.itemStacks.isNotEmpty()) {
+                                if (mail is IMailNormalImpl && mail.data.itemStacks.isNotEmpty()) {
                                     ItemPreviewMenu(player, data, mail, mail.data.itemStacks).open()
                                 }
                             }

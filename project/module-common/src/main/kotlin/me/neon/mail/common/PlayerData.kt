@@ -1,11 +1,8 @@
 package me.neon.mail.common
 
-import me.neon.mail.NeonMailLoader
-import me.neon.mail.SetTings
 import me.neon.mail.api.mail.IMail
 import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.function.getProxyPlayer
-import taboolib.module.lang.sendLang
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -54,20 +51,6 @@ data class PlayerData(
         return getProxyPlayer(uuid)
     }
 
-    fun removeTimerOutMail() {
-        var amount = 0
-        val timer = System.currentTimeMillis()
-        receiveBox.removeIf {
-            if (timer >= NeonMailLoader.getExpiryTimer(it.senderTimer)) {
-                amount++
-                true
-            } else false
-        }
-        if (amount != 0) {
-            getPlayer()?.sendLang("玩家-邮件到期-删除", amount)
-            // 更新数据库
-        }
-    }
 
     fun setExtendData(data: String) {
 

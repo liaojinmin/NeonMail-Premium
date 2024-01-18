@@ -19,6 +19,7 @@ taboolib {
         }
         dependencies {
             bukkitApi("1.13")
+            name("PlaceholderAPI").optional(true)
         }
     }
     install("common", "platform-bukkit")

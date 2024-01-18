@@ -1,7 +1,8 @@
-package me.neon.mail.menu.edit
+package me.neon.mail.menu
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import taboolib.platform.util.sendLang
 
 /**
  * NeonMail-Premium
@@ -10,9 +11,11 @@ import org.bukkit.inventory.Inventory
  * @author 老廖
  * @since 2024/1/9 1:04
  */
-interface DraftEdite {
+interface IDraftEdite {
 
     val player: Player
+
+    val admin: Boolean
 
     fun openMenu() {
         player.openInventory(getInventory())

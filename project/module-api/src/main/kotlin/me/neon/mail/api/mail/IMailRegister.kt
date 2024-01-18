@@ -5,6 +5,7 @@ import com.google.gson.FieldAttributes
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.info
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -33,8 +34,6 @@ object IMailRegister {
             }
         })
         .setPrettyPrinting()
-
-
 
     fun getRegisterMail(type: String): IMail<*>? {
         return mailCache[type]
@@ -68,9 +67,11 @@ object IMailRegister {
 
     internal fun register(mail: IMail<*>) {
         mailCache[mail.mailType] = mail
-        info("注册的邮件类 -> ${mail.getMailClassType()}")
-        info("  索引种类名称 -> ${mail.mailType}")
-        info("  数据类 -> ${mail.getDataType()}")
+        console().sendMessage("""§8[§bNeon§9Mail§8-§ePremium§8][§6注册§8]
+            |    §e注册的邮件类 -> §6${mail.getMailClassType()}
+            |    §e索引种类名称 -> §6${mail.mailType}
+            |    §e数据类 -> §6${mail.getDataType()}
+        """.trimMargin())
         gsonBuilder.registerTypeAdapter(mail.getMailClassType(), mail)
         gsonBuilder.registerTypeAdapter(mail.getDataType(), mail)
     }

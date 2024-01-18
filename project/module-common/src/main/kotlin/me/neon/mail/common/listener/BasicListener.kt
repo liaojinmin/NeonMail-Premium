@@ -1,4 +1,4 @@
-package me.neon.mail.listener
+package me.neon.mail.common.listener
 
 import me.neon.mail.service.ServiceManager
 import me.neon.mail.service.ServiceManager.waitDTO

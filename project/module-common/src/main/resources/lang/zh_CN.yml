@@ -320,7 +320,7 @@
   - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
   - '&l'
   - '§A   ♻&7请输入邮件内容 &7并以 &f回车键 &7结束'
-  - '§A   ♻&7输入 &fCancel &7取消'
+  - '§A   ♻&7输入 &fCancel &7取消 ,&7使用 &f; &7换行文本'
   - '&l'
 邮件-编辑操作-指令:
   - type: sound
@@ -350,6 +350,16 @@
   - '§A   ♻&7请输入要邮寄的金币 &f整数 &7并以 &f回车键 &7结束'
   - '§A   ♻&7输入 &fCancel &7取消'
   - '&l'
+邮件-编辑操作-金币不足:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你没有足够的金币添加附件...'
+  - '&l'
 邮件-编辑操作-点券:
   - type: title
     title: '&c请输入数量'
@@ -367,6 +377,16 @@
   - '§A   ♻&7请输入要邮寄的金币 &f整数 &7并以 &f回车键 &7结束'
   - '§A   ♻&7输入 &fCancel &7取消'
   - '&l'
+邮件-编辑操作-点券不足:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你没有足够的点券添加附件...'
+  - '&l'
 邮件-编辑操作-输入类型错误:
   - type: sound
     sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
@@ -377,7 +397,26 @@
   - '&l'
   - '§c   输入错误，需要输入数字(整数)'
   - '&l'
-
+邮件-编辑操作-输入长度超出:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你输入了过长的文本, 限制 &f{0} &c长度, 当前长度 &f{1} &c...'
+  - '&l'
+邮件-编辑操作-输入存在屏蔽词:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你输入了过长的文本, 限制 &f255 &c长度, 当前长度 &f{0} &c...'
+  - '&l'
 
 CMD-HELP-ADMIN:
   - '  &c管理员: '
@@ -387,3 +426,13 @@ CMD-HELP-PLAYER:
   - '  &a玩家: '
   - '    &7-&f box &f<&7邮箱种类&f>'
   - '      &8打开对应种类的UI面板'
+PLAYER-ADMIN-MENU:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&e    请注意你使用了超级权限打开了编辑菜单，将不再扣除附件需求...'
+  - '&l'

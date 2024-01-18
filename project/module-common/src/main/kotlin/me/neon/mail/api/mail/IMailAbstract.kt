@@ -4,11 +4,14 @@ package me.neon.mail.api.mail
 import me.neon.mail.NeonMailLoader
 import me.neon.mail.service.ServiceManager.getPlayerData
 import me.neon.mail.service.ServiceManager.insertMail
-import me.neon.mail.SetTings
 import me.neon.mail.common.DataTypeNormal
-import me.neon.mail.common.IMailDefaultImpl
+import me.neon.mail.common.IMailNormalImpl
+import me.neon.mail.common.MailDraftBuilder
+import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuIcon
+import me.neon.mail.service.packet.PlayOutMailReceivePacket
 import me.neon.mail.utils.parseMailInfo
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -40,10 +43,6 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
 
     override var collectTimer: Long = -1L
 
-    override var senderDel: Int = 0
-
-    override var targetDel: Int = 0
-
     override fun sendMail() {
         var targetName = "目标"
         getProxyPlayer(target)?.let {
@@ -53,8 +52,9 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
                 val info = if (context.length >= 11) context.substring(0, 10) + "§8..." else context
                 it.sendLang("玩家-接收邮件-送达", title, info)
             }
-        } ?: sendCrossMail()
+        } ?: sendCrossMail(target)
         if (sender != IMailRegister.console) {
+            // 理论上发生者不可能不在线，就算切服仍然能够获取
             getProxyPlayer(sender)?.let {
                 it.getPlayerData()?.let { data ->
                     data.senderBox.add(this)
@@ -65,26 +65,34 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
         insertMail()
     }
 
-    internal fun sendCrossMail() {
-       // TODO("Not yet implemented")
+    override fun sendGlobalMail() {
+        // 全局邮件必须以控制台身份发送，不管发送者是谁，自动修正。
+        // 因为只有管理员能够发送这种类型
+        Bukkit.getOfflinePlayers().forEach {
+            this.cloneMail(UUID.randomUUID(), IMailRegister.console, it.uniqueId, data).sendMail()
+        }
     }
 
-    internal fun sendGlobalMail() {
-      //  TODO("Not yet implemented")
+    private fun sendCrossMail(player: UUID) {
+       PlayOutMailReceivePacket(player, this.uuid).senderPacket()
     }
+
+
 
     open fun parseDataUpdateCallBack(
         icon: MenuIcon,
         player: Player,
         type: IMailDataType,
-        openCall: () -> Unit
+        builder: MailDraftBuilder,
+        edite: IDraftEdite
     ): Pair<ItemStack, ClickEvent.() -> Unit> {
         if (type !is DataTypeNormal) {
             warning("请不要使用默认方法解析非默认附件种类 ${data::class.java} eq ${DataTypeNormal::class.java}")
             return ItemStack(Material.AIR) to {}
         }
-        if (this is IMailDefaultImpl) {
-            return type.parseDataUpdateCallBack(icon, player, openCall)
+
+        if (this is IMailNormalImpl) {
+            return type.parseDataUpdateCallBack(icon, player, builder, edite)
         } else TODO("自定义附件种类请实现 -> parseDataUpdateCallBack() 方法")
     }
 

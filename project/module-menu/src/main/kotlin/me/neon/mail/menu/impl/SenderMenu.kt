@@ -60,8 +60,6 @@ class SenderMenu(
                                         player.sendLang("邮件-删除操作-成功", data.senderBox.size)
                                         // 复制
                                         val list = data.senderBox.toList()
-                                        // 修改状态
-                                        list.forEach { mail -> mail.senderDel = 1 }
                                         // 更新
                                         list.deleteMails(true)
                                         // 清理

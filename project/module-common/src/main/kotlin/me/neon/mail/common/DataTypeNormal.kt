@@ -3,9 +3,12 @@ package me.neon.mail.common
 import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
+import me.neon.mail.hook.ProviderRegister
+import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuData
 import me.neon.mail.menu.MenuIcon
 import me.neon.mail.menu.MenuLoader
+import me.neon.mail.service.ServiceManager.updateToSql
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -17,7 +20,9 @@ import taboolib.module.nms.getName
 import taboolib.module.ui.ClickEvent
 import taboolib.module.ui.buildMenu
 import taboolib.module.ui.type.Linked
+import taboolib.platform.compat.getBalance
 import taboolib.platform.compat.replacePlaceholder
+import taboolib.platform.compat.withdrawBalance
 import taboolib.platform.type.BukkitPlayer
 import taboolib.platform.util.cancelNextChat
 import taboolib.platform.util.inputBook
@@ -117,7 +122,8 @@ data class DataTypeNormal(
     fun parseDataUpdateCallBack(
         icon: MenuIcon,
         player: Player,
-        openCall: () -> Unit
+        builder: MailDraftBuilder,
+        edite: IDraftEdite
     ): Pair<ItemStack, ClickEvent.() -> Unit> {
         return when (icon.char) {
             '1' -> {
@@ -129,8 +135,19 @@ data class DataTypeNormal(
                         if (it.equals("cancel", ignoreCase = true)) {
                             player.cancelNextChat(false)
                         } else if (it.isInt()) {
-                            money = it.toIntOrNull() ?: 0
-                            submit { openCall.invoke() }
+                            val a = it.toDoubleOrNull() ?: 0.0
+                            if (a <= 0) {
+                                player.sendLang("邮件-编辑操作-输入类型错误")
+                            } else {
+                                if (edite.admin || player.withdrawBalance(a).transactionSuccess()) {
+                                    money = a.toInt()
+                                    submit { edite.openMenu() }
+                                    builder.updateToSql()
+                                } else {
+                                    player.sendLang("邮件-编辑操作-金币不足")
+                                    submit { edite.openMenu() }
+                                }
+                            }
                         } else {
                             player.sendLang("邮件-编辑操作-输入类型错误")
                         }
@@ -138,21 +155,36 @@ data class DataTypeNormal(
                 }
             }
             '2' -> {
-                icon.parseItems(player, "[points]" to points) to {
-                    // 修改点券数量
-                    player.closeInventory()
-                    player.sendLang("邮件-编辑操作-点券")
-                    player.nextChatInTick(400, {
-                        if (it.equals("cancel", ignoreCase = true)) {
-                            player.cancelNextChat(false)
-                        } else if (it.isInt()) {
-                            points = it.toIntOrNull() ?: 0
-                            submit { openCall.invoke() }
-                        } else {
-                            player.sendLang("邮件-编辑操作-输入类型错误")
-                        }
-                    })
-                }
+                // 如果没有点券提供者，这个图标不显示
+                ProviderRegister.points?.let { api ->
+                    icon.parseItems(player, "[points]" to points) to {
+                        // 修改点券数量
+                        player.closeInventory()
+                        player.sendLang("邮件-编辑操作-点券")
+                        player.nextChatInTick(400, {
+                            if (it.equals("cancel", ignoreCase = true)) {
+                                player.cancelNextChat(false)
+                            } else if (it.isInt()) {
+                                // 判断玩家点券是否足够
+                                val a = it.toIntOrNull() ?: 0
+                                if (a <= 0) {
+                                    player.sendLang("邮件-编辑操作-输入类型错误")
+                                } else {
+                                    if (edite.admin || api.value.take(player, a)) {
+                                        points = a
+                                        submit { edite.openMenu() }
+                                        builder.updateToSql()
+                                    } else {
+                                        player.sendLang("邮件-编辑操作-点券不足")
+                                        submit { edite.openMenu() }
+                                    }
+                                }
+                            } else {
+                                player.sendLang("邮件-编辑操作-输入类型错误")
+                            }
+                        })
+                    }
+                } ?: (ItemStack(Material.AIR) to {})
             }
             '3' -> {
                 // 非管理员不显示这个图标
@@ -165,8 +197,9 @@ data class DataTypeNormal(
                             if (it.isNotEmpty()) {
                                 command.clear()
                                 command.addAll(it)
+                                builder.updateToSql()
                             }
-                            openCall.invoke()
+                            edite.openMenu()
                         }
                     }
                 } else ItemStack(Material.AIR) to {}
@@ -174,7 +207,7 @@ data class DataTypeNormal(
             '4' -> {
                 icon.parseItems(player, "[itemStacks]" to parseItemInfo(player)) to {
                     // 修改物品
-                    MailItemEditMenu(player, openCall, this@DataTypeNormal).openMenu()
+                    MailItemEditMenu(player, builder,this@DataTypeNormal, edite).openMenu()
                 }
             }
             else -> {
@@ -201,10 +234,13 @@ data class DataTypeNormal(
         return list
     }
 
+
+    // TODO: 这里需要不锁定玩家点击 
     class MailItemEditMenu(
         private val player: Player,
-        private val uiBack: () -> Unit,
+        private val builders: MailDraftBuilder,
         private val type: IMailDataType,
+        private val edite: IDraftEdite,
     ) {
 
         private val menuData: MenuData = MenuLoader.itemEditeMenu
@@ -218,11 +254,8 @@ data class DataTypeNormal(
                 menuData.title.replacePlaceholder(player)
             ) {
                 map(*menuData.layout)
-
                 rows(menuData.layout.size)
-
                 slots(menuData.getCharSlotIndex('@'))
-
                 elements {
                     // TODO("标记，未验证玩家取走物品后列表是否更新")
                     if (type is DataTypeNormal) {
@@ -239,7 +272,8 @@ data class DataTypeNormal(
                         'B' -> {
                             set(key, value.parseItems(player)) {
                                 isCancelled = true
-                                uiBack.invoke()
+                                edite.openMenu()
+                                builders.updateToSql()
                             }
                         }
                         else -> {
@@ -252,7 +286,6 @@ data class DataTypeNormal(
                         }
                     }
                 }
-
             }
         }
     }

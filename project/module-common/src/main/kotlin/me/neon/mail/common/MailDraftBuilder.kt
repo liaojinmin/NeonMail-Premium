@@ -3,18 +3,17 @@ package me.neon.mail.common
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.mail.*
 import me.neon.mail.service.ServiceManager.deleteToSql
-import me.neon.mail.api.mail.IMail
-import me.neon.mail.api.mail.IMailDataType
-import me.neon.mail.api.mail.IMailRegister
-import me.neon.mail.api.mail.IMailState
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.module.lang.sendLang
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 /**
  * NeonMail-Premium
- * me.neon.mail.provider
+ * me.neon.mail.common
  *
  * @author 老廖
  * @since 2024/1/6 15:15
@@ -25,9 +24,34 @@ class MailDraftBuilder(
     val uuid: UUID = UUID.randomUUID(),
     var title: String = "not title",
     val context: MutableList<String> = mutableListOf("not context"),
+    private var globalModel: Boolean = false,
     // 玩家名称 、 附件
-    val targets: MutableMap<UUID, IMailDataType> = mutableMapOf()
+    private val targets: ConcurrentHashMap<UUID, IMailDataType> = ConcurrentHashMap()
 ) {
+
+
+    fun checkGlobalModel(): Boolean {
+        return globalModel
+    }
+
+    fun addTarget(uuid: UUID, dataType: IMailDataType) {
+        // 如果允许管理员发重复邮件，则取消这个判断，
+        // 不然切换了全局模式，就不能再添加其它玩家
+        if (!globalModel) {
+            targets[uuid] = dataType
+        }
+    }
+    fun getTargets(): ConcurrentHashMap<UUID, IMailDataType> {
+        return targets
+    }
+
+    fun changeGlobalModel(): IMailDataType  {
+        globalModel = true
+        val a = getMailSource<IMailAbstract<*>>().createData()
+        targets.clear()
+        targets[IMailRegister.console] = a
+        return a
+    }
 
     fun senderMail() {
         // 获取邮件注册类
@@ -45,7 +69,6 @@ class MailDraftBuilder(
                         } else {
                             it.cloneMail(UUID.randomUUID(), sender, key, value)
                         }
-
                         // 设置基本信息
                         new.title = title
                         new.context = text
@@ -55,7 +78,13 @@ class MailDraftBuilder(
                         } else {
                             new.state = IMailState.NotObtained
                         }
-                        new.sendMail()
+                        if (globalModel) {
+                            new.sendGlobalMail()
+                        } else if (key != IMailRegister.console) {
+                            new.sendMail()
+                        } else {
+                            error("系统异常，不是全局管理员模式，但发送目标是控制台...")
+                        }
                     }
                     NeonMailLoader.debug("MailDraftBuilder.senderMail() -> 已同步删除数据库中的草稿箱")
                 } else {
@@ -64,6 +93,7 @@ class MailDraftBuilder(
             }
         }
     }
+
 
 
     inline fun <reified T: IMail<*>> getMailSource(): T {
@@ -78,6 +108,7 @@ class MailDraftBuilder(
         }
         return true
     }
+
     fun isAllowDeletion(): Boolean {
         for (pr in targets.values) {
             if (pr.hasAppendix()) {
@@ -89,27 +120,23 @@ class MailDraftBuilder(
     }
 
     companion object {
-        fun serialize(targets: MutableMap<UUID, IMailDataType>): ByteArray {
-            NeonMailLoader.debug("MailEditeBuilder -> serialize")
-            targets.forEach { (t, u) ->
-                NeonMailLoader.debug("    key: $t")
-                NeonMailLoader.debug("    value: $u")
-            }
-            return IMailRegister.getGsonBuilder().toJson(targets).toByteArray()
+        fun serialize(builder: ConcurrentHashMap<UUID, IMailDataType>): ByteArray {
+        //    NeonMailLoader.debug("MailEditeBuilder -> serialize")
+         //   targets.forEach { (t, u) ->
+          //      NeonMailLoader.debug("    key: $t")
+          //      NeonMailLoader.debug("    value: $u")
+         //   }
+            return IMailRegister.getGsonBuilder().toJson(builder).toByteArray()
         }
 
-        fun deserialize(data: ByteArray, type: Class<out IMailDataType>): MutableMap<UUID, IMailDataType> {
-            NeonMailLoader.debug("MailEditeBuilder -> deserialize")
-            NeonMailLoader.debug("    data: ${String(data, Charsets.UTF_8)}")
+        fun deserialize(data: ByteArray, type: Class<out IMailDataType>): ConcurrentHashMap<UUID, IMailDataType> {
+         //   NeonMailLoader.debug("MailEditeBuilder -> deserialize")
+         //   NeonMailLoader.debug("    data: ${String(data, Charsets.UTF_8)}")
             val gson = IMailRegister.getGsonBuilder()
-            val map = mutableMapOf<UUID, IMailDataType>()
+            val map = ConcurrentHashMap<UUID, IMailDataType>()
             val obj = JsonParser.parseString(String(data, Charsets.UTF_8)) as JsonObject
             obj.entrySet().forEach {
                 map[UUID.fromString(it.key)] = gson.fromJson(it.value, type)
-            }
-            map.forEach { (t, u) ->
-                NeonMailLoader.debug("    key: $t")
-                NeonMailLoader.debug("    value: $u")
             }
             return map
         }

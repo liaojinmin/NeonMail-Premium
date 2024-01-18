@@ -2,10 +2,7 @@ package me.neon.mail.menu.edit
 
 import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.common.PlayerData
-import me.neon.mail.menu.MenuLoader
-import me.neon.mail.menu.setupDefaultAction
-import me.neon.mail.menu.setupNext
-import me.neon.mail.menu.setupPrev
+import me.neon.mail.menu.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import taboolib.module.ui.buildMenu
@@ -23,8 +20,9 @@ import taboolib.platform.util.sendLang
  */
 class DraftBoxMenu(
     override val player: Player,
-    private val data: PlayerData
-): DraftEdite {
+    private val data: PlayerData,
+    override val admin: Boolean = false
+): IDraftEdite {
 
     private val menuData = MenuLoader.draftBoxMenu
 
@@ -59,7 +57,7 @@ class DraftBoxMenu(
             }
 
             onClick { _, element ->
-                DraftMailEditeMenu(player, data, element).openMenu()
+                DraftMailEditeMenu(player, data, element, admin).openMenu()
             }
 
             menuData.icon.forEach { (key, value) ->
@@ -69,9 +67,9 @@ class DraftBoxMenu(
                             if (data.getAllDraft().size >= 20) {
                                 player.sendLang("玩家-草稿邮件-已满")
                             } else {
-                                TypeSelectMenu(player) {
+                                TypeSelectMenu(player, admin) {
                                     data.addDraft(it)
-                                    DraftMailEditeMenu(player, data, it).openMenu()
+                                    DraftMailEditeMenu(player, data, it, admin).openMenu()
                                 }.openMenu()
                             }
                         }

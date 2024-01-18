@@ -26,15 +26,19 @@ interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
     var collectTimer: Long
     var data: T
 
-    var senderDel: Int
-    var targetDel: Int
 
     val permission: String
     val mainIcon: XMaterial
     val mailType: String
     val plugin: String
 
+
     fun sendMail()
+
+    /**
+     * 像全部服务器玩家发送邮件，
+     */
+    fun sendGlobalMail()
 
     fun checkClaimCondition(player: ProxyPlayer): Boolean
 

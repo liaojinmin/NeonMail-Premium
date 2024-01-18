@@ -10,10 +10,11 @@ val kotlinVersionNum: String
     get() = project.kotlin.coreLibrariesVersion.replace(".", "")
 
 dependencies {
+    implementation(project(":project:module-hook"))
     implementation(project(":project:module-api"))
     implementation(project(":project:module-common"))
     implementation(project(":project:module-menu"))
-    implementation(project(":project:module-bukkit"))
+    implementation(project(":project:platform-bukkit"))
 }
 
 tasks {

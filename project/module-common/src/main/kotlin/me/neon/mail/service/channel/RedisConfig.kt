@@ -6,6 +6,7 @@ package me.neon.mail.service.channel
  *
  **/
 data class RedisConfig(
+    val use: Boolean = false,
     val host: String = "",
     val port: Int = 0,
     val password: String = "",

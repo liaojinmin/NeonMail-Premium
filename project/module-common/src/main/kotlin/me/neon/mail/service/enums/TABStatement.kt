@@ -33,5 +33,19 @@ enum class TABStatement(val statement: String) {
     /**
      * 标记接收者已删除邮件
      */
-    MAIL_TD_DELETE("UPDATE ${SQLImpl.mailTAB} SET `td`=? WHERE `uuid`=? LIMIT 1")
+    MAIL_TD_DELETE("UPDATE ${SQLImpl.mailTAB} SET `td`=? WHERE `uuid`=? LIMIT 1"),
+
+
+    // 草稿箱相关
+    /**
+     * 查询玩家 20 个草稿箱内容
+     */
+    SELECT_DRAFTS("SELECT `uuid`,`type`,`title`,`context`,`global`,`data` FROM ${SQLImpl.draftTAB} WHERE sender=? LIMIT 20"),
+
+
+
+    // 玩家数据
+    SELECT_PLAYER_DATA("SELECT `mail`,`data` FROM ${SQLImpl.userTAB} WHERE uuid=? LIMIT 1"),
+    UPDATE_PLAYER_DATA("UPDATE ${SQLImpl.userTAB} SET `user`=?, `mail`=?, `data`=? WHERE `uuid`=? LIMIT 1"),
+    INSERT_PLAYER_DATA("INSERT INTO ${SQLImpl.userTAB}(`uuid`,`user`,`mail`,`data`) VALUES(?,?,?,?)")
 }

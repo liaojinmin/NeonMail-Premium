@@ -1,5 +1,6 @@
-package me.neon.mail.cmd
+package me.neon.mail.menu
 
+import me.neon.mail.cmd.ICmd
 import me.neon.mail.service.ServiceManager
 import me.neon.mail.service.ServiceManager.selectAllDraft
 import me.neon.mail.menu.edit.DraftBoxMenu
@@ -20,7 +21,7 @@ import taboolib.platform.util.sendLang
  * @author 老廖
  * @since 2024/1/9 16:18
  */
-object CmdBox: ICmd {
+object CmdMenu: ICmd {
 
     override val command = subCommand {
         dynamic("种类") {
@@ -28,7 +29,6 @@ object CmdBox: ICmd {
             execute<Player> { sender, context, _ ->
                 openMenu(sender, context["种类"])
             }
-
             dynamic("目标玩家", true, "neonMail.command.box.at") {
                 suggest { Bukkit.getOnlinePlayers().map { it.displayName } }
                 execute<CommandSender> { sender, context, _ ->
@@ -41,7 +41,7 @@ object CmdBox: ICmd {
     }
 
 
-    private fun openMenu(player: Player, type: String) {
+    internal fun openMenu(player: Player, type: String, admin: Boolean = false) {
         ServiceManager.getPlayerData(player.uniqueId)?.let {
             when (type) {
                 "senderBox" -> {
@@ -55,13 +55,19 @@ object CmdBox: ICmd {
                 "editeBox" -> {
                     // 先检查草稿箱是否为空，如果为空可能没加载草稿数据，需要尝试一次加载
                     if (it.checkDraft()) {
-                        DraftBoxMenu(player, it).openMenu()
+                        if (admin) {
+                            player.sendLang("PLAYER-ADMIN-MENU")
+                        }
+                        DraftBoxMenu(player, it, admin = admin).openMenu()
                     } else {
                         player.sendLang("玩家-草稿邮件-查询中")
                         it.selectAllDraft { data ->
                             it.applyDraft(data)
                             submit {
-                                DraftBoxMenu(player, it).openMenu()
+                                if (admin) {
+                                    player.sendLang("PLAYER-ADMIN-MENU")
+                                }
+                                DraftBoxMenu(player, it, admin = admin).openMenu()
                             }
                         }
                     }

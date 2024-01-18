@@ -6,11 +6,13 @@ import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.common.PlayerData
 import me.neon.mail.service.channel.RedisChannel
 import me.neon.mail.service.channel.ChannelInit
+import me.neon.mail.service.channel.PluginChannel
 import me.neon.mail.utils.asyncRunner
 import me.neon.mail.utils.asyncRunnerWithResult
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.ProxyPlayer
+import taboolib.module.lang.sendLang
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -19,13 +21,15 @@ object ServiceManager {
 
     val packetRegister: ConcurrentHashMap<Int, (message: List<String>) -> Unit> = ConcurrentHashMap()
 
-    val sqlDataCache: ConcurrentHashMap<UUID, PlayerData> = ConcurrentHashMap()
+    private val sqlDataCache: ConcurrentHashMap<UUID, PlayerData> = ConcurrentHashMap()
 
     /**
      * 用于跨服操作，不储存玩家数据
      */
-    val channel: ChannelInit by lazy {
-        RedisChannel(NeonMailLoader.redisConfig)
+    internal val channel: ChannelInit by lazy {
+        if (NeonMailLoader.redisConfig.use) {
+            RedisChannel(NeonMailLoader.redisConfig)
+        } else PluginChannel()
     }
 
     private val sqlImpl: SQLImpl by lazy {
@@ -36,13 +40,13 @@ object ServiceManager {
     @Awake(LifeCycle.ACTIVE)
     fun startInit() {
         sqlImpl.start()
-       // channel.onStart()
+        channel.onStart()
     }
 
     @Awake(LifeCycle.DISABLE)
     fun close() {
         sqlImpl.close()
-      //  channel.onClose()
+        channel.onClose()
     }
 
 
@@ -74,6 +78,21 @@ object ServiceManager {
         }
     }
 
+    fun selectMail(uuid: UUID, callBack: (IMail<*>?) -> Unit) {
+        asyncRunnerWithResult {
+            onJob {
+                sqlImpl.selectMail(uuid)
+            }
+            onComplete { mail, timer ->
+                callBack.invoke(mail)
+                NeonMailLoader.debug("""selectAllDraft() ->
+                    |
+                    |    查询 $uuid 邮件数据耗时 ($timer)ms...
+                    |
+                """.trimMargin())
+            }
+        }
+    }
     fun IMail<*>.deleteMail(isSenderDel: Boolean) {
         asyncRunner {
             onJob {
@@ -81,7 +100,6 @@ object ServiceManager {
             }
         }
     }
-
     fun IMail<*>.insertMail() {
         asyncRunner {
             onJob {
@@ -122,7 +140,7 @@ object ServiceManager {
             onComplete { _, timer ->
                 NeonMailLoader.debug("""selectAllDraft() ->
                     |
-                    |    查询 $user 草稿数据耗时 $timer ms...
+                    |    查询 $user 草稿数据耗时 ($timer)ms...
                     |
                 """.trimMargin())
             }
@@ -148,7 +166,7 @@ object ServiceManager {
             }
             onComplete { _, timer ->
                 NeonMailLoader.debug("""
-                    waitDTO() -> 查询 $name 数据耗时 $timer ms...
+                    waitDTO() -> 查询 $name 数据耗时 ($timer)ms...
                 """.trimIndent())
             }
         }
@@ -162,7 +180,21 @@ object ServiceManager {
     fun getPlayerData(uuid: UUID): PlayerData? {
         val data = sqlDataCache[uuid]
         if (data != null) {
-            data.removeTimerOutMail()
+            var amount = 0
+            val timer = System.currentTimeMillis()
+            val list = data.receiveBox.filter {
+                if (timer >= NeonMailLoader.getExpiryTimer(it.senderTimer)) {
+                    amount++
+                    true
+                } else {
+                    false
+                }
+            }
+            if (amount != 0) {
+                data.receiveBox.removeIf { timer >= NeonMailLoader.getExpiryTimer(it.senderTimer) }
+                data.getPlayer()?.sendLang("玩家-邮件到期-删除", amount)
+                list.deleteMails(false)
+            }
         }
         return data
     }

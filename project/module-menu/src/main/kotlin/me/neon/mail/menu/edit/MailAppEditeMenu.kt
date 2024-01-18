@@ -1,11 +1,12 @@
 package me.neon.mail.menu.edit
 
-import me.neon.mail.service.ServiceManager.updateToSql
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.common.PlayerData
 import me.neon.mail.menu.MenuLoader
 import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.api.mail.IMailAbstract
+import me.neon.mail.api.mail.IMailRegister
+import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuData
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -27,10 +28,11 @@ class MailAppEditeMenu(
     override val player: Player,
     private val data: PlayerData,
     private val mail: MailDraftBuilder,
-    private val dataKey: UUID,
+    private val playerUUID: UUID,
     private val type: IMailDataType,
-    private val backCall: DraftEdite?
-): DraftEdite {
+    private val backCall: IDraftEdite?,
+    override val admin: Boolean = false
+): IDraftEdite {
 
     private val menuData: MenuData = MenuLoader.mailAppEditeMenu
 
@@ -47,25 +49,27 @@ class MailAppEditeMenu(
                 when (key) {
                     'B' -> {
                         set(key, value.parseItems(player)) {
-                            backCall?.openMenu() ?: DraftMailEditeMenu(player, data, mail).openMenu()
+                            backCall?.openMenu() ?: DraftMailEditeMenu(player, data, mail, admin).openMenu()
                         }
                     }
                     'P' -> {
-                        val target = Bukkit.getOfflinePlayer(dataKey)
-                        val item = value.parseItems(player, "[player]" to target.name)
-                        val meta = item.itemMeta
-                        if (meta is SkullMeta) {
-                            meta.owningPlayer = target
-                            item.itemMeta = meta
+                        if (playerUUID == IMailRegister.console) {
+                            val item = value.parseItems(player, "[player]" to "all")
+                            set(key, item)
+                        } else {
+                            val target = Bukkit.getOfflinePlayer(playerUUID)
+                            val item = value.parseItems(player, "[player]" to target.name)
+                            val meta = item.itemMeta
+                            if (meta is SkullMeta) {
+                                meta.owningPlayer = target
+                                item.itemMeta = meta
+                            }
+                            set(key, item)
                         }
-                        set(key, item)
                     }
                     else -> {
                         val back = mail.getMailSource<IMailAbstract<*>>()
-                            .parseDataUpdateCallBack(value, player, type) {
-                                mail.updateToSql()
-                                openMenu()
-                        }
+                            .parseDataUpdateCallBack(value, player, type, mail, this@MailAppEditeMenu)
                         set(key, back.first, back.second)
                     }
                 }

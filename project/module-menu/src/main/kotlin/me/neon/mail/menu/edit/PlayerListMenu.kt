@@ -2,6 +2,7 @@ package me.neon.mail.menu.edit
 
 import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMailAbstract
+import me.neon.mail.api.mail.IMailRegister
 import me.neon.mail.common.PlayerData
 import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.menu.*
@@ -23,8 +24,9 @@ class PlayerListMenu(
     override val player: Player,
     private val data: PlayerData,
     private val mailSenderBuilder: MailDraftBuilder,
-    private val backCall: DraftEdite
-): DraftEdite {
+    private val backCall: IDraftEdite,
+    override val admin: Boolean = false
+): IDraftEdite {
 
     private val menuData: MenuData = MenuLoader.playerListMenu
 
@@ -41,21 +43,31 @@ class PlayerListMenu(
             elements { Bukkit.getOnlinePlayers().toList() }
 
             onGenerate { _, element, _, _ ->
-                NeonMailLoader.debug("构建 -> ${element.name}")
                 menuData.getCharMenuIcon('@').parseItems(element)
             }
 
-            onClick { _, element ->
+            onClick { _, playerEle ->
                 val type = mailSenderBuilder.getMailSource<IMailAbstract<*>>().createData()
-                mailSenderBuilder.targets[element.uniqueId] = type
-                MailAppEditeMenu(player, data, mailSenderBuilder, element.uniqueId, type, backCall).openMenu()
+                mailSenderBuilder.addTarget(playerEle.uniqueId, type)
+                MailAppEditeMenu(player, data, mailSenderBuilder, playerEle.uniqueId, type, backCall, admin).openMenu()
             }
 
             menuData.icon.forEach { (key, value) ->
                 when (key) {
                     'B' -> {
+                        NeonMailLoader.debug("B playerlist")
                         set(key, value.parseItems(player)) {
                             backCall.openMenu()
+                        }
+                    }
+                    'A' -> {
+                        NeonMailLoader.debug("A playerlist")
+                        if (admin) {
+                            set(key, value.parseItems(player)) {
+                                MailAppEditeMenu(player, data,
+                                    mailSenderBuilder, IMailRegister.console, mailSenderBuilder.changeGlobalModel(), backCall, admin
+                                ).openMenu()
+                            }
                         }
                     }
                     '>' -> setupNext(player, value, key)

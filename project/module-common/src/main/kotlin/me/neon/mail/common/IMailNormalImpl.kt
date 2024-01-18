@@ -7,6 +7,7 @@ import com.google.gson.JsonSerializationContext
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
+import me.neon.mail.hook.ProviderRegister
 import me.neon.mail.menu.MenuIcon
 import me.neon.mail.utils.deserializeItemStacks
 import me.neon.mail.utils.serializeItemStacks
@@ -34,7 +35,7 @@ import java.util.*
  * @author 老廖
  * @since 2024/1/2 17:43
  */
-class IMailDefaultImpl(
+class IMailNormalImpl(
     override val uuid: UUID = UUID.randomUUID(),
     override val sender: UUID,
     override val target: UUID,
@@ -68,7 +69,7 @@ class IMailDefaultImpl(
             bukkitPlayer.depositBalance(data.money.toDouble())
         }
         if (data.points > 0) {
-            TODO()
+            ProviderRegister.points?.value?.add(bukkitPlayer, data.points) ?: warning("找不到可用的点券实现系统...")
         }
         if (data.command.isNotEmpty()) {
             data.command.replacePlaceholder(bukkitPlayer).forEach { out ->
@@ -99,7 +100,7 @@ class IMailDefaultImpl(
     }
 
 
-    override fun getMailClassType(): Class<out IMailDefaultImpl> {
+    override fun getMailClassType(): Class<out IMailNormalImpl> {
         return this::class.java
     }
 
@@ -112,7 +113,13 @@ class IMailDefaultImpl(
     }
 
     override fun cloneMail(uuid: UUID, sender: UUID, target: UUID, data: IMailDataType): IMail<DataTypeNormal> {
-        return IMailDefaultImpl(uuid, sender, target, data as DataTypeNormal)
+        val obj = IMailNormalImpl(uuid, sender, target, data as DataTypeNormal)
+        obj.title = this.title
+        obj.context = this.context
+        obj.state = this.state
+        obj.senderTimer = this.senderTimer
+        obj.collectTimer = this.collectTimer
+        return obj
     }
 
     override fun deserialize(p0: JsonElement, p1: Type, p2: JsonDeserializationContext): DataTypeNormal {

@@ -1,11 +1,9 @@
 package me.neon.mail.menu.edit
 
+import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMailRegister
 import me.neon.mail.common.MailDraftBuilder
-import me.neon.mail.menu.MenuLoader
-import me.neon.mail.menu.setupDefaultAction
-import me.neon.mail.menu.setupNext
-import me.neon.mail.menu.setupPrev
+import me.neon.mail.menu.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import taboolib.module.ui.buildMenu
@@ -22,8 +20,9 @@ import taboolib.platform.util.ItemBuilder
  */
 class TypeSelectMenu(
     override val player: Player,
+    override val admin: Boolean = false,
     private val callBack: (MailDraftBuilder) -> Unit
-): DraftEdite {
+): IDraftEdite {
 
     private val menuData = MenuLoader.typeSelectMenu
 
@@ -43,7 +42,8 @@ class TypeSelectMenu(
                 val itemBuilder = ItemBuilder(icon.mats)
                 itemBuilder.name = icon.name
                     .replacePlaceholder(player)
-                    .replace("[type]", element)
+                    // 使用翻译种类展示
+                    .replace("[type]", NeonMailLoader.typeTranslate[element] ?: element)
                 itemBuilder.customModelData = icon.model
                 itemBuilder.build()
             }

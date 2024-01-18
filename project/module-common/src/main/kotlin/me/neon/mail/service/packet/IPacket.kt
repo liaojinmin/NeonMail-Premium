@@ -11,14 +11,9 @@ import me.neon.mail.service.ServiceManager
  */
 interface IPacket {
 
-    val data: DataPacket?
-
-    fun getTargetChannel(): String
-
-
     fun getPacketIndexId(): Int
 
-    fun sender() {
+    fun senderPacket() {
         ServiceManager.channel.sendPacket(this)
     }
 }

@@ -58,6 +58,7 @@ enum class TABMysql(val tab: String) {
                 " `sender`        CHAR(36)       NOT NULL," +
                 " `title`         VARCHAR(255)   NOT NULL," +
                 " `context`       TEXT           NOT NULL," +
+                " `global`        Boolean        NOT NULL," +
                 " `data`          MEDIUMTEXT     NOT NULL," +
                 " `time`          TIMESTAMP      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
                 "PRIMARY KEY (`uuid`)" +

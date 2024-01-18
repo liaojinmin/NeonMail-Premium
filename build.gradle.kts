@@ -32,9 +32,7 @@ subprojects {
     dependencies {
         compileOnly(kotlin("stdlib"))
 
-        // 引入 Taboolib
         compileOnly("io.izzel.taboolib:common:$taboolibVersion")
-
         implementation("io.izzel.taboolib:common-5:$taboolibVersion")
         implementation("io.izzel.taboolib:module-chat:$taboolibVersion")
         implementation("io.izzel.taboolib:module-configuration:$taboolibVersion")

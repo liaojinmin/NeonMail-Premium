@@ -7,6 +7,7 @@ import me.neon.mail.common.PlayerData
 import me.neon.mail.service.channel.RedisChannel
 import me.neon.mail.service.channel.ChannelInit
 import me.neon.mail.service.channel.PluginChannel
+import me.neon.mail.service.packet.PlayOutMailReceivePacket
 import me.neon.mail.utils.asyncRunner
 import me.neon.mail.utils.asyncRunnerWithResult
 import taboolib.common.LifeCycle
@@ -32,15 +33,14 @@ object ServiceManager {
         } else PluginChannel()
     }
 
-    private val sqlImpl: SQLImpl by lazy {
-        SQLImpl()
-    }
+    private val sqlImpl: SQLImpl by lazy { SQLImpl() }
 
 
     @Awake(LifeCycle.ACTIVE)
     fun startInit() {
         sqlImpl.start()
         channel.onStart()
+        PlayOutMailReceivePacket.registerPacket()
     }
 
     @Awake(LifeCycle.DISABLE)

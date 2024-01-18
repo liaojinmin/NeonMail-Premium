@@ -99,10 +99,6 @@ object NeonMailLoader {
         if (deBug) console().sendMessage("§8[§bNeon§9Mail§8-§ePremium§8][§cDEBUG§8] §f$text")
     }
 
-    fun say(msg: String) {
-        console().sendMessage("§8[§bNeon§9Mail§8-§ePremium§8] §f${msg.replace("&", "§")}")
-    }
-
     fun checkInput(text: String): Boolean {
         return inputCheck.find { it.matches(text) } != null
     }

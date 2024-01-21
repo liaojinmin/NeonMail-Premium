@@ -1,11 +1,13 @@
 package me.neon.mail.service
 
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.PlayerData
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailRegister
 import me.neon.mail.api.mail.IMailState
-import me.neon.mail.common.MailDraftBuilder
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.DraftBuilderimpl
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.service.enums.TABMysql
 import me.neon.mail.service.enums.TABSqlite
 import me.neon.mail.service.enums.TABStatement
@@ -303,7 +305,7 @@ class SQLImpl {
     }
 
 
-    fun deleteDrafts(edite: List<MailDraftBuilder>, callBack: (Int) -> Unit) {
+    fun deleteDrafts(edite: List<IDraftBuilder>, callBack: (Int) -> Unit) {
         if (edite.isEmpty()) return
         getConnection {
             try {
@@ -336,7 +338,7 @@ class SQLImpl {
         }
     }
 
-    fun updateDrafts(edite: List<MailDraftBuilder>) {
+    fun updateDrafts(edite: List<IDraftBuilder>) {
         if (edite.isEmpty()) return
         getConnection {
             try {
@@ -360,7 +362,7 @@ class SQLImpl {
                         it.setString(4, draft.title)
                         it.setStringList(5, draft.context)
                         it.setBoolean(6, draft.checkGlobalModel())
-                        it.setBytes(7, MailDraftBuilder.serialize(draft.getTargets()))
+                        it.setBytes(7, DraftBuilderimpl.serialize(draft.getTargets()))
                         it.addBatch()
                     }
                     it.executeBatch()
@@ -376,14 +378,14 @@ class SQLImpl {
         }
     }
 
-    fun selectDrafts(player: UUID, callBack: (MutableList<MailDraftBuilder>) -> Unit) {
+    fun selectDrafts(player: UUID, callBack: (MutableList<IDraftBuilder>) -> Unit) {
         getConnection {
             this.prepareStatement(
                 TABStatement.SELECT_DRAFTS.statement
             ).action {
                 it.setUUID(1, player)
                 it.executeQuery().get { res ->
-                    val list = mutableListOf<MailDraftBuilder>()
+                    val list = mutableListOf<IDraftBuilder>()
                     while (res.next()) {
                         val type = res.getString("type")
                         IMailRegister.getRegisterMail(type)?.let { im ->
@@ -391,8 +393,8 @@ class SQLImpl {
                             val title = res.getString("title")
                             val context = res.getStringList("context").toMutableList()
                             val global = res.getBoolean("global")
-                            val data = MailDraftBuilder.deserialize(res.getBytes("data"), im.getDataType())
-                            list.add(MailDraftBuilder(player, type, uuid, title, context, global, data))
+                            val data = DraftBuilderimpl.deserialize(res.getBytes("data"), im.getDataClassType())
+                            list.add(DraftBuilderimpl(player, type, uuid, title, context, global, data))
                         } ?: warning("在获取草稿邮件时发生以外，邮件种类缺少 -> $type")
                     }
                     callBack.invoke(list)
@@ -445,7 +447,7 @@ class SQLImpl {
                 ).action {
                     it.setString(1, player.uniqueId.toString())
                     val res = it.executeQuery()
-                    val playerData = PlayerData(player.uniqueId, player.displayName!!)
+                    val playerData = PlayerDataImpl(player.uniqueId, player.displayName!!)
                     if (res.next()) {
                         playerData.mail = res.getString("mail")
                         playerData.setExtendData(res.getString("data"))
@@ -466,7 +468,7 @@ class SQLImpl {
             val uuid = UUID.fromString(this.getString("uuid"))
             val sender = UUID.fromString(this.getString("sender"))
             val target = UUID.fromString(this.getString("target"))
-            val data = IMailRegister.deserializeMailData(this.getBytes("data"), mail.getDataType())
+            val data = IMailRegister.deserializeMailData(this.getBytes("data"), mail.getDataClassType())
             val mailObj = mail.cloneMail(uuid, sender, target, data)
             mailObj.title = this.getString("title")
             mailObj.context = this.getString("context")

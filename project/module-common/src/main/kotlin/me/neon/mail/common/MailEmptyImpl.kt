@@ -20,7 +20,7 @@ import java.util.*
  * @author 老廖
  * @since 2024/1/17 5:48
  */
-class IMailEmptyImpl(
+class MailEmptyImpl(
     override val uuid: UUID = UUID.randomUUID(),
     override val sender: UUID,
     override val target: UUID,
@@ -40,7 +40,7 @@ class IMailEmptyImpl(
         return this::class.java
     }
 
-    override fun getDataType(): Class<out DataTypeEmpty> {
+    override fun getDataClassType(): Class<out DataTypeEmpty> {
         return DataTypeEmpty::class.java
     }
 
@@ -49,7 +49,7 @@ class IMailEmptyImpl(
     }
 
     override fun cloneMail(uuid: UUID, sender: UUID, target: UUID, data: IMailDataType): IMail<DataTypeEmpty> {
-        return IMailEmptyImpl(uuid, sender, target, if (data is DataTypeEmpty) data else DataTypeEmpty())
+        return MailEmptyImpl(uuid, sender, target, if (data is DataTypeEmpty) data else DataTypeEmpty())
     }
 
     override fun deserialize(p0: JsonElement?, p1: Type?, p2: JsonDeserializationContext?): DataTypeEmpty {

@@ -46,7 +46,7 @@ interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
 
     fun getMailClassType(): Class<out IMail<T>>
 
-    fun getDataType(): Class<out T>
+    fun getDataClassType(): Class<out T>
 
     /**
      * 创建附件实体

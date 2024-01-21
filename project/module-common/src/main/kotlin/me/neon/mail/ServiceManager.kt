@@ -1,19 +1,22 @@
-package me.neon.mail.service
+package me.neon.mail
 
-import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.PlayerData
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMail
-import me.neon.mail.common.MailDraftBuilder
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
+import me.neon.mail.service.SQLImpl
 import me.neon.mail.service.channel.RedisChannel
 import me.neon.mail.service.channel.ChannelInit
 import me.neon.mail.service.channel.PluginChannel
 import me.neon.mail.service.packet.PlayOutMailReceivePacket
+import me.neon.mail.smtp.SmtpService
 import me.neon.mail.utils.asyncRunner
 import me.neon.mail.utils.asyncRunnerWithResult
+import org.bukkit.Bukkit
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.ProxyPlayer
-import taboolib.module.lang.sendLang
+import taboolib.platform.util.sendLang
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -35,16 +38,26 @@ object ServiceManager {
 
     private val sqlImpl: SQLImpl by lazy { SQLImpl() }
 
+    private val smtpImpl: SmtpService by lazy {
+        SmtpService(NeonMailLoader.smtpTranslate)
+    }
+
+    fun getSmtpImpl(): SmtpService? {
+        if (NeonMailLoader.useSmtp) {
+            return smtpImpl
+        }
+        return null
+    }
 
     @Awake(LifeCycle.ACTIVE)
-    fun startInit() {
+    private fun startInit() {
         sqlImpl.start()
         channel.onStart()
         PlayOutMailReceivePacket.registerPacket()
     }
 
     @Awake(LifeCycle.DISABLE)
-    fun close() {
+    private fun close() {
         sqlImpl.close()
         channel.onClose()
     }
@@ -56,10 +69,7 @@ object ServiceManager {
                 sqlImpl.updateMailsState(this@updateState)
             }
             onError {
-                NeonMailLoader.debug("""
-                    updateState() ->
-                       更新邮件状态时发生异常，附件领取将失效...
-                """.trimIndent())
+                NeonMailLoader.debug("updateState() -> 更新邮件状态时发生异常，附件领取将失效...")
                 it.printStackTrace()
             }
             onComplete { run, _ ->
@@ -108,7 +118,7 @@ object ServiceManager {
         }
     }
 
-    fun MailDraftBuilder.deleteToSql(callBack: (Int) -> Unit) {
+    fun IDraftBuilder.deleteToSql(callBack: (Int) -> Unit) {
         asyncRunner {
             onJob {
                 sqlImpl.deleteDrafts(listOf(this@deleteToSql), callBack)
@@ -116,7 +126,7 @@ object ServiceManager {
         }
     }
 
-    fun MailDraftBuilder.updateToSql() {
+    fun IDraftBuilder.updateToSql() {
         asyncRunner {
             onJob {
                 sqlImpl.updateDrafts(listOf(this@updateToSql))
@@ -124,17 +134,14 @@ object ServiceManager {
         }
     }
 
-    fun PlayerData.selectAllDraft(callBack: (MutableList<MailDraftBuilder>) -> Unit) {
+    fun PlayerDataImpl.selectAllDraft(callBack: (MutableList<IDraftBuilder>) -> Unit) {
         asyncRunner {
             onJob {
                 draftIsLoad = true
                 sqlImpl.selectDrafts(uuid, callBack)
             }
             onError {
-                NeonMailLoader.debug("""
-                    selectAllDraft() ->
-                       查询 $user 草稿箱配置时发生异常...
-                """.trimIndent())
+                NeonMailLoader.debug("selectAllDraft() -> 查询 $user 草稿箱配置时发生异常...")
                 it.printStackTrace()
             }
             onComplete { _, timer ->
@@ -159,9 +166,7 @@ object ServiceManager {
                 }
             }
             onError {
-                NeonMailLoader.debug("""
-                    waitDTO() -> 查询 $name 数据时发生异常...
-                """.trimIndent())
+                NeonMailLoader.debug("waitDTO() -> 查询 $name 数据时发生异常...")
                 it.printStackTrace()
             }
             onComplete { _, timer ->
@@ -192,20 +197,14 @@ object ServiceManager {
             }
             if (amount != 0) {
                 data.receiveBox.removeIf { timer >= NeonMailLoader.getExpiryTimer(it.senderTimer) }
-                data.getPlayer()?.sendLang("玩家-邮件到期-删除", amount)
+                Bukkit.getPlayer(data.uuid)?.sendLang("玩家-邮件到期-删除", amount)
                 list.deleteMails(false)
             }
         }
         return data
     }
 
-    fun PlayerData.savePlayerData() {
-        asyncRunner {
-            onJob {
-                sqlImpl.updatePlayerData(this@savePlayerData)
-            }
-        }
-    }
+
     fun savePlayerData(uuid: UUID, delCache: Boolean = false) {
         if (delCache) {
             sqlDataCache.remove(uuid)?.let {

@@ -1,6 +1,5 @@
 package me.neon.mail.common
 
-import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.api.mail.IMailState
 import taboolib.common.platform.ProxyPlayer
@@ -14,8 +13,12 @@ import taboolib.common.platform.ProxyPlayer
  */
 class DataTypeEmpty: IMailDataType {
 
-    override fun getAppendixInfo(player: ProxyPlayer, pad: String, refresh: Boolean): String {
-        return IMailState.Text.state
+    override fun getAppendixInfo(player: ProxyPlayer?, pad: String, refresh: Boolean): String {
+        return pad + IMailState.Text.state
+    }
+
+    override fun getAppendixInfo(pad: String): String {
+        return pad + IMailState.Text.state
     }
 
     override fun hasAppendix(): Boolean {

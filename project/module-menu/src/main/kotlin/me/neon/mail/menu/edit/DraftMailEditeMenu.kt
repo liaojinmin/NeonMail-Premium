@@ -1,13 +1,13 @@
 package me.neon.mail.menu.edit
 
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailRegister
-import me.neon.mail.service.ServiceManager.deleteToSql
-import me.neon.mail.service.ServiceManager.updateToSql
+import me.neon.mail.ServiceManager.deleteToSql
+import me.neon.mail.ServiceManager.updateToSql
 import me.neon.mail.api.mail.IMailDataType
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.common.DataTypeEmpty
-import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.menu.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -29,8 +29,8 @@ import java.util.UUID
  */
 class DraftMailEditeMenu(
     override val player: Player,
-    private val data: PlayerData,
-    private val mail: MailDraftBuilder,
+    private val data: PlayerDataImpl,
+    private val mail: IDraftBuilder,
     override val admin: Boolean = false
 ): IDraftEdite {
 

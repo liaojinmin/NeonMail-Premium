@@ -1,8 +1,9 @@
 package me.neon.mail.menu
 
 import me.neon.mail.cmd.ICmd
-import me.neon.mail.service.ServiceManager
-import me.neon.mail.service.ServiceManager.selectAllDraft
+import me.neon.mail.common.PlayerDataImpl
+import me.neon.mail.ServiceManager
+import me.neon.mail.ServiceManager.selectAllDraft
 import me.neon.mail.menu.edit.DraftBoxMenu
 import me.neon.mail.menu.impl.ReceiveMenu
 import me.neon.mail.menu.impl.SenderMenu
@@ -43,6 +44,7 @@ object CmdMenu: ICmd {
 
     internal fun openMenu(player: Player, type: String, admin: Boolean = false) {
         ServiceManager.getPlayerData(player.uniqueId)?.let {
+            if (it !is PlayerDataImpl) return
             when (type) {
                 "senderBox" -> {
                     SenderMenu(player, it).openMenu()
@@ -54,7 +56,7 @@ object CmdMenu: ICmd {
                 }
                 "editeBox" -> {
                     // 先检查草稿箱是否为空，如果为空可能没加载草稿数据，需要尝试一次加载
-                    if (it.checkDraft()) {
+                    if (it.checkDraftIsLoad()) {
                         if (admin) {
                             player.sendLang("PLAYER-ADMIN-MENU")
                         }

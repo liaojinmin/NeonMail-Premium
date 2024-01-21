@@ -2,7 +2,7 @@ package me.neon.mail.service.channel
 
 
 import me.neon.mail.NeonMailLoader
-import me.neon.mail.service.ServiceManager
+import me.neon.mail.ServiceManager
 import me.neon.mail.service.packet.AbstractPacket
 import me.neon.mail.service.packet.IPacket
 import taboolib.common.platform.function.pluginId

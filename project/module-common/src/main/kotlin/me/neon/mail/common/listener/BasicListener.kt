@@ -1,7 +1,7 @@
 package me.neon.mail.common.listener
 
-import me.neon.mail.service.ServiceManager
-import me.neon.mail.service.ServiceManager.waitDTO
+import me.neon.mail.ServiceManager
+import me.neon.mail.ServiceManager.waitDTO
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.event.SubscribeEvent

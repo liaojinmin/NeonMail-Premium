@@ -1,8 +1,9 @@
 package me.neon.mail.menu.edit
 
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailRegister
-import me.neon.mail.common.MailDraftBuilder
+import me.neon.mail.common.DraftBuilderimpl
 import me.neon.mail.menu.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -21,7 +22,7 @@ import taboolib.platform.util.ItemBuilder
 class TypeSelectMenu(
     override val player: Player,
     override val admin: Boolean = false,
-    private val callBack: (MailDraftBuilder) -> Unit
+    private val callBack: (IDraftBuilder) -> Unit
 ): IDraftEdite {
 
     private val menuData = MenuLoader.typeSelectMenu
@@ -50,7 +51,7 @@ class TypeSelectMenu(
 
             onClick { _, element ->
                 IMailRegister.getRegisterMail(element)?.let {
-                    callBack.invoke(MailDraftBuilder(player.uniqueId, element))
+                    callBack.invoke(DraftBuilderimpl(player.uniqueId, element))
                 }
             }
 

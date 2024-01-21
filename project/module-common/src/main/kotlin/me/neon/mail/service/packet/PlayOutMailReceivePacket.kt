@@ -1,6 +1,6 @@
 package me.neon.mail.service.packet
 
-import me.neon.mail.service.ServiceManager
+import me.neon.mail.ServiceManager
 import org.bukkit.Bukkit
 import java.util.UUID
 

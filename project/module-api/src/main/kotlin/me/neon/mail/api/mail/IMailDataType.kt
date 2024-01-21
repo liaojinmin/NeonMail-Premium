@@ -11,7 +11,9 @@ import taboolib.common.platform.ProxyPlayer
  */
 interface IMailDataType {
 
-    fun getAppendixInfo(player: ProxyPlayer, pad: String = "", refresh: Boolean = false): String
+    fun getAppendixInfo(player: ProxyPlayer?, pad: String = "", refresh: Boolean = false): String
+
+    fun getAppendixInfo(pad: String = ""): String
 
     fun hasAppendix(): Boolean
 

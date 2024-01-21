@@ -1,11 +1,12 @@
 package me.neon.mail.menu.edit
 
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailDataType
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.menu.MenuLoader
-import me.neon.mail.common.MailDraftBuilder
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailRegister
+import me.neon.mail.common.DraftBuilderimpl.Companion.getMailSource
 import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuData
 import org.bukkit.Bukkit
@@ -26,8 +27,8 @@ import java.util.UUID
  */
 class MailAppEditeMenu(
     override val player: Player,
-    private val data: PlayerData,
-    private val mail: MailDraftBuilder,
+    private val data: PlayerDataImpl,
+    private val mail: IDraftBuilder,
     private val playerUUID: UUID,
     private val type: IMailDataType,
     private val backCall: IDraftEdite?,

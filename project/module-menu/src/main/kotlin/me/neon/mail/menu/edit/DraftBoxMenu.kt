@@ -1,7 +1,7 @@
 package me.neon.mail.menu.edit
 
-import me.neon.mail.common.MailDraftBuilder
-import me.neon.mail.common.PlayerData
+import me.neon.mail.api.mail.IDraftBuilder
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.menu.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -20,14 +20,14 @@ import taboolib.platform.util.sendLang
  */
 class DraftBoxMenu(
     override val player: Player,
-    private val data: PlayerData,
+    private val data: PlayerDataImpl,
     override val admin: Boolean = false
 ): IDraftEdite {
 
     private val menuData = MenuLoader.draftBoxMenu
 
     override fun getInventory(): Inventory {
-        return buildMenu<Linked<MailDraftBuilder>>(menuData.title.replacePlaceholder(player)) {
+        return buildMenu<Linked<IDraftBuilder>>(menuData.title.replacePlaceholder(player)) {
 
             map(*menuData.layout)
 

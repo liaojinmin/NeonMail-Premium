@@ -12,6 +12,6 @@ import taboolib.platform.type.BukkitProxyEvent
  * @since 2024/1/5 19:42
  */
 class MailIconBuilderEvent(
-    mail: IMail<*>,
-    itemStack: ItemStack
+    val mail: IMail<*>,
+    val itemStack: ItemStack
 ): BukkitProxyEvent()

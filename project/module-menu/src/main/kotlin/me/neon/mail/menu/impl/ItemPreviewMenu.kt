@@ -1,7 +1,7 @@
 package me.neon.mail.menu.impl
 
 import me.neon.mail.api.mail.IMailAbstract
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.menu.MenuData
 import me.neon.mail.menu.MenuLoader
 import org.bukkit.entity.Player
@@ -19,7 +19,7 @@ import taboolib.platform.compat.replacePlaceholder
  */
 class ItemPreviewMenu(
     private val player: Player,
-    private val data: PlayerData,
+    private val data: PlayerDataImpl,
     private val mail: IMailAbstract<*>,
     private val mails: List<ItemStack>
 ) {

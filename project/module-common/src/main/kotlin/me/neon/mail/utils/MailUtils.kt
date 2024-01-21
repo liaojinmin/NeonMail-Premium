@@ -6,7 +6,6 @@ import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailAbstract
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
-import taboolib.common.platform.function.getProxyPlayer
 import java.text.SimpleDateFormat
 
 /**
@@ -43,7 +42,7 @@ val replacements: Map<Regex, (IMail<*>) -> String> by lazy {
         GET_TIME to { if (it.collectTimer < 1000) NeonMailLoader.typeTranslate["未提取"] ?: "未提取" else format.format(it.collectTimer) },
         TEXT to { it.context },
         STATE to { NeonMailLoader.typeTranslate[it.state.state] ?: it.state.state },
-        ITEM to { (it as IMailAbstract<*>).data.getAppendixInfo(getProxyPlayer(it.target) ?: getProxyPlayer(it.sender) ?: error("找不到用于解析的玩家")) },
+        ITEM to { (it as IMailAbstract<*>).data.getAppendixInfo() },
         EXPIRE to {
             if (NeonMailLoader.getExpiryTimer() != -1L) { format.format(it.senderTimer + NeonMailLoader.getExpiryTimer()) } else ""
         }

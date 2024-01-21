@@ -15,6 +15,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven("https://maven.aliyun.com/repository/central")
         maven("https://oss.sonatype.org/content/repositories/snapshots")
         maven("https://repo.tabooproject.org/repository/releases")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
@@ -49,6 +50,8 @@ subprojects {
 
         implementation("redis.clients:jedis:4.2.2")
         implementation("com.zaxxer:HikariCP:4.0.3")
+        implementation("javax.mail:javax.mail-api:1.6.2") { isTransitive = false }
+        implementation("javax.activation:activation:1.1.1") { isTransitive = false }
 
 
         // server

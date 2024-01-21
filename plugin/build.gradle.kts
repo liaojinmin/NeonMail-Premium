@@ -11,6 +11,7 @@ val kotlinVersionNum: String
 
 dependencies {
     implementation(project(":project:module-hook"))
+    implementation(project(":project:module-smtp"))
     implementation(project(":project:module-api"))
     implementation(project(":project:module-common"))
     implementation(project(":project:module-menu"))
@@ -26,6 +27,7 @@ tasks {
         exclude("module-info.java")
 
         exclude("com/google/**")
+        exclude("com/sun/**")
         exclude("org/apache/**")
         exclude("org/slf4j/**")
         exclude("org/json/**")
@@ -40,6 +42,10 @@ tasks {
 
         // redis
         relocate("redis.clients", "${rootProject.group}.libs.redis.clients")
+
+        // javax
+        relocate("javax.mail", "${rootProject.group}.libs.javax.mail")
+        relocate("javax.activation", "${rootProject.group}.libs.javax.activation")
 
 
     }

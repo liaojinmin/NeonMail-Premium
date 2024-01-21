@@ -1,6 +1,7 @@
 package me.neon.mail.common
 
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.hook.ProviderRegister
@@ -8,7 +9,7 @@ import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuData
 import me.neon.mail.menu.MenuIcon
 import me.neon.mail.menu.MenuLoader
-import me.neon.mail.service.ServiceManager.updateToSql
+import me.neon.mail.ServiceManager.updateToSql
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -20,10 +21,8 @@ import taboolib.module.nms.getName
 import taboolib.module.ui.ClickEvent
 import taboolib.module.ui.buildMenu
 import taboolib.module.ui.type.Linked
-import taboolib.platform.compat.getBalance
 import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.compat.withdrawBalance
-import taboolib.platform.type.BukkitPlayer
 import taboolib.platform.util.cancelNextChat
 import taboolib.platform.util.inputBook
 import taboolib.platform.util.nextChatInTick
@@ -48,73 +47,79 @@ data class DataTypeNormal(
         return money != 0 || points != 0 || command.isNotEmpty() || itemStacks.isNotEmpty()
     }
 
-    override fun getAppendixInfo(player: ProxyPlayer, pad: String, refresh: Boolean): String {
-        NeonMailLoader.debug("getAppendixInfo ${player.displayName}")
-        fun parse(): String {
-            val str: StringBuilder = StringBuilder()
-            var bs = 0
-            var index = 0
-            if (money > 0) {
-                NeonMailLoader.debug("解析金币值变量 -> $money")
-                str.append(pad).append(
-                    NeonMailLoader.mailDisAppend
-                        .replace("{0}", "金币")
-                        .replace("{1}", (money).toString()))
-                bs++
-            }
-            if (points > 0) {
-                NeonMailLoader.debug("解析点券值变量 -> $points")
-                str.append(pad).append(
-                    NeonMailLoader.mailDisAppend
-                        .replace("{0}", "点券")
-                        .replace("{1}", (points).toString()))
-                bs++
-            }
-            if (command.isNotEmpty()) {
-                if (command[0].isNotEmpty()) {
-                    NeonMailLoader.debug("解析指令值变量 -> $command")
-                    str.append(pad).append(
-                        NeonMailLoader.mailDisAppend
-                            .replace("{0}", "指令包")
-                            .replace("{1}", (command.size).toString())
-                    )
-                    bs++
-                } else {
-                    NeonMailLoader.debug("异常的指令大小，其内容为空 ->${command[0]}<-")
-                    command.clear()
-                }
-            }
-            if (itemStacks.isNotEmpty()) {
-                for (stack in itemStacks) {
-                    val meta = stack.itemMeta
-                    if (meta != null && bs < 6) {
-                        val manes = stack.getName((player as BukkitPlayer).player)
-                        if (manes != "NO_LOCALE") {
-                            str.append(pad).append(
-                                NeonMailLoader.mailDisAppend
-                                    .replace("{0}", manes)
-                                    .replace("{1}", (stack.amount).toString())
-                            )
-                        } else {
-                            index++
-                        }
-                    }
-                    bs++
-                }
-            }
-            if (index > 0 || bs >= 6) {
-                if ((bs - 6) > 0) {
-                    str.append(pad).append(NeonMailLoader.mailDisMiss.replace("{0}", (index + (bs - 6)).toString()))
-                }
-            }
-            return str.toString()
+    override fun getAppendixInfo(pad: String): String {
+        val str: StringBuilder = StringBuilder()
+        var bs = 0
+        var index = 0
+        if (money > 0) {
+            NeonMailLoader.debug("解析金币值变量 -> $money")
+            str.append(pad).append(
+                NeonMailLoader.mailDisAppend
+                    .replace("{0}", "金币")
+                    .replace("{1}", (money).toString()))
+            bs++
         }
+        if (points > 0) {
+            NeonMailLoader.debug("解析点券值变量 -> $points")
+            str.append(pad).append(
+                NeonMailLoader.mailDisAppend
+                    .replace("{0}", "点券")
+                    .replace("{1}", (points).toString()))
+            bs++
+        }
+        if (command.isNotEmpty()) {
+            if (command[0].isNotEmpty()) {
+                NeonMailLoader.debug("解析指令值变量 -> $command")
+                str.append(pad).append(
+                    NeonMailLoader.mailDisAppend
+                        .replace("{0}", "指令包")
+                        .replace("{1}", (command.size).toString())
+                )
+                bs++
+            } else {
+                NeonMailLoader.debug("异常的指令大小，其内容为空 ->${command[0]}<-")
+                command.clear()
+            }
+        }
+        if (itemStacks.isNotEmpty()) {
+            for (stack in itemStacks) {
+                val meta = stack.itemMeta
+                if (meta != null && bs < 6) {
+                    val manes = stack.getName()
+                    if (manes != "NO_LOCALE") {
+                        str.append(pad).append(
+                            NeonMailLoader.mailDisAppend
+                                .replace("{0}", manes)
+                                .replace("{1}", (stack.amount).toString())
+                        )
+                    } else {
+                        index++
+                    }
+                }
+                bs++
+            }
+        }
+        if (index > 0 || bs >= 6) {
+            if ((bs - 6) > 0) {
+                str.append(pad).append(NeonMailLoader.mailDisMiss.replace("{0}", (index + (bs - 6)).toString()))
+            }
+        }
+        return str.toString()
+    }
+
+    override fun getAppendixInfo(player: ProxyPlayer?, pad: String, refresh: Boolean): String {
         val text: String
         if (refresh) {
-            text = parse()
-            IMailAbstract.appendixCache[player.uniqueId] = text
+            text = getAppendixInfo(pad)
+            if (player != null) {
+                IMailAbstract.appendixCache[player.uniqueId] = text
+            }
         } else {
-            text = IMailAbstract.appendixCache.computeIfAbsent(player.uniqueId) { parse() }
+            text = if (player != null) {
+                IMailAbstract.appendixCache.computeIfAbsent(player.uniqueId) { getAppendixInfo(pad) }
+            } else {
+                getAppendixInfo(pad)
+            }
         }
         return text
     }
@@ -122,7 +127,7 @@ data class DataTypeNormal(
     fun parseDataUpdateCallBack(
         icon: MenuIcon,
         player: Player,
-        builder: MailDraftBuilder,
+        builder: IDraftBuilder,
         edite: IDraftEdite
     ): Pair<ItemStack, ClickEvent.() -> Unit> {
         return when (icon.char) {
@@ -238,7 +243,7 @@ data class DataTypeNormal(
     // TODO: 这里需要不锁定玩家点击 
     class MailItemEditMenu(
         private val player: Player,
-        private val builders: MailDraftBuilder,
+        private val builders: IDraftBuilder,
         private val type: IMailDataType,
         private val edite: IDraftEdite,
     ) {

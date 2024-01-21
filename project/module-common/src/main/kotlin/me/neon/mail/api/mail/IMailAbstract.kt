@@ -2,13 +2,14 @@ package me.neon.mail.api.mail
 
 
 import me.neon.mail.NeonMailLoader
-import me.neon.mail.service.ServiceManager.getPlayerData
-import me.neon.mail.service.ServiceManager.insertMail
+import me.neon.mail.ServiceManager.getPlayerData
+import me.neon.mail.ServiceManager.insertMail
 import me.neon.mail.common.DataTypeNormal
-import me.neon.mail.common.IMailNormalImpl
-import me.neon.mail.common.MailDraftBuilder
+import me.neon.mail.common.MailNormalImpl
 import me.neon.mail.menu.IDraftEdite
 import me.neon.mail.menu.MenuIcon
+import me.neon.mail.ServiceManager
+import me.neon.mail.api.event.MailIconBuilderEvent
 import me.neon.mail.service.packet.PlayOutMailReceivePacket
 import me.neon.mail.utils.parseMailInfo
 import org.bukkit.Bukkit
@@ -51,6 +52,11 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
                 data.receiveBox.add(this)
                 val info = if (context.length >= 11) context.substring(0, 10) + "§8..." else context
                 it.sendLang("玩家-接收邮件-送达", title, info)
+
+                // 未解决玩家离线时的smtp、发送。
+                if (data.mail.isNotEmpty()) {
+                    ServiceManager.getSmtpImpl()?.sendEmail(data.mail, this)
+                }
             }
         } ?: sendCrossMail(target)
         if (sender != IMailRegister.console) {
@@ -83,17 +89,18 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
         icon: MenuIcon,
         player: Player,
         type: IMailDataType,
-        builder: MailDraftBuilder,
+        builder: IDraftBuilder,
         edite: IDraftEdite
     ): Pair<ItemStack, ClickEvent.() -> Unit> {
         if (type !is DataTypeNormal) {
             warning("请不要使用默认方法解析非默认附件种类 ${data::class.java} eq ${DataTypeNormal::class.java}")
             return ItemStack(Material.AIR) to {}
         }
-
-        if (this is IMailNormalImpl) {
+        if (this is MailNormalImpl) {
             return type.parseDataUpdateCallBack(icon, player, builder, edite)
-        } else TODO("自定义附件种类请实现 -> parseDataUpdateCallBack() 方法")
+        } else {
+            TODO("自定义附件种类请实现 -> parseDataUpdateCallBack() 方法,并定位到相应的按钮解析")
+        }
     }
 
     open fun parseMailIcon(icon: MenuIcon): ItemStack {
@@ -106,14 +113,12 @@ abstract class IMailAbstract<T: IMailDataType>: IMail<T> {
             }
             hideAll()
         }
-        /*
+ 
         val event = MailIconBuilderEvent(this, item)
         if (!event.callEvent()) {
             return ItemStack(Material.AIR)
         }
-
-         */
-        return item
+        return event.itemStack
     }
 
 

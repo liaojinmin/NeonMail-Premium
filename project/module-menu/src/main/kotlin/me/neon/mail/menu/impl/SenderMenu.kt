@@ -1,8 +1,8 @@
 package me.neon.mail.menu.impl
 
-import me.neon.mail.service.ServiceManager.deleteMails
+import me.neon.mail.ServiceManager.deleteMails
 import me.neon.mail.api.mail.IMail
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.menu.*
 import org.bukkit.entity.Player
@@ -23,7 +23,7 @@ import taboolib.platform.util.sendLang
  */
 class SenderMenu(
     override val player: Player,
-    private val data: PlayerData
+    private val data: PlayerDataImpl
 ): IMenu {
     override val menuData: MenuData = MenuLoader.senderMenu
 

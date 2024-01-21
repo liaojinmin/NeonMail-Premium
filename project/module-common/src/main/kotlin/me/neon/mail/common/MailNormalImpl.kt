@@ -35,7 +35,7 @@ import java.util.*
  * @author 老廖
  * @since 2024/1/2 17:43
  */
-class IMailNormalImpl(
+class MailNormalImpl(
     override val uuid: UUID = UUID.randomUUID(),
     override val sender: UUID,
     override val target: UUID,
@@ -80,7 +80,6 @@ class IMailNormalImpl(
                     e.printStackTrace()
                 }
             }
-
         }
         return true
     }
@@ -100,11 +99,11 @@ class IMailNormalImpl(
     }
 
 
-    override fun getMailClassType(): Class<out IMailNormalImpl> {
+    override fun getMailClassType(): Class<out MailNormalImpl> {
         return this::class.java
     }
 
-    override fun getDataType(): Class<out DataTypeNormal> {
+    override fun getDataClassType(): Class<out DataTypeNormal> {
         return DataTypeNormal::class.java
     }
 
@@ -113,7 +112,7 @@ class IMailNormalImpl(
     }
 
     override fun cloneMail(uuid: UUID, sender: UUID, target: UUID, data: IMailDataType): IMail<DataTypeNormal> {
-        val obj = IMailNormalImpl(uuid, sender, target, data as DataTypeNormal)
+        val obj = MailNormalImpl(uuid, sender, target, data as DataTypeNormal)
         obj.title = this.title
         obj.context = this.context
         obj.state = this.state

@@ -6,7 +6,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import taboolib.common.platform.function.console
-import taboolib.common.platform.function.info
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -70,10 +69,10 @@ object IMailRegister {
         console().sendMessage("""§8[§bNeon§9Mail§8-§ePremium§8][§6注册§8]
             |    §e注册的邮件类 -> §6${mail.getMailClassType()}
             |    §e索引种类名称 -> §6${mail.mailType}
-            |    §e数据类 -> §6${mail.getDataType()}
+            |    §e数据类 -> §6${mail.getDataClassType()}
         """.trimMargin())
         gsonBuilder.registerTypeAdapter(mail.getMailClassType(), mail)
-        gsonBuilder.registerTypeAdapter(mail.getDataType(), mail)
+        gsonBuilder.registerTypeAdapter(mail.getDataClassType(), mail)
     }
 
     internal fun unregister(mail: IMail<*>) {

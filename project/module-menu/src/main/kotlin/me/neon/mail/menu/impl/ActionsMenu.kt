@@ -1,12 +1,12 @@
 package me.neon.mail.menu.impl
 
-import me.neon.mail.service.ServiceManager.deleteMail
-import me.neon.mail.service.ServiceManager.updateState
+import me.neon.mail.ServiceManager.deleteMail
+import me.neon.mail.ServiceManager.updateState
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailState
-import me.neon.mail.common.PlayerData
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.menu.MenuLoader
-import me.neon.mail.common.IMailNormalImpl
+import me.neon.mail.common.MailNormalImpl
 import me.neon.mail.menu.MenuData
 import me.neon.mail.utils.parseMailInfo
 import org.bukkit.entity.Player
@@ -26,7 +26,7 @@ import taboolib.platform.util.sendLang
  */
 class ActionsMenu(
     private val player: Player,
-    private val data: PlayerData,
+    private val data: PlayerDataImpl,
     private val mail: IMailAbstract<*>,
 ) {
     private val menuData: MenuData = MenuLoader.actionsMenu
@@ -56,7 +56,7 @@ class ActionsMenu(
                         set(key, value.parseItems(player, mail.parseMailInfo(value.lore))) {
                             // 没有领取则允许打开
                             if (mail.state == IMailState.NotObtained) {
-                                if (mail is IMailNormalImpl && mail.data.itemStacks.isNotEmpty()) {
+                                if (mail is MailNormalImpl && mail.data.itemStacks.isNotEmpty()) {
                                     ItemPreviewMenu(player, data, mail, mail.data.itemStacks).open()
                                 }
                             }

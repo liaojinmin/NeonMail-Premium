@@ -1,10 +1,11 @@
 package me.neon.mail.menu.edit
 
 import me.neon.mail.NeonMailLoader
+import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailRegister
-import me.neon.mail.common.PlayerData
-import me.neon.mail.common.MailDraftBuilder
+import me.neon.mail.common.DraftBuilderimpl.Companion.getMailSource
+import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.menu.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -22,8 +23,8 @@ import taboolib.platform.compat.replacePlaceholder
  */
 class PlayerListMenu(
     override val player: Player,
-    private val data: PlayerData,
-    private val mailSenderBuilder: MailDraftBuilder,
+    private val data: PlayerDataImpl,
+    private val mailSenderBuilder: IDraftBuilder,
     private val backCall: IDraftEdite,
     override val admin: Boolean = false
 ): IDraftEdite {

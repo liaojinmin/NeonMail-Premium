@@ -1,9 +1,9 @@
 package me.neon.mail
 
 import com.google.gson.GsonBuilder
-import me.neon.mail.common.IMailNormalImpl
+import me.neon.mail.common.MailNormalImpl
 import me.neon.mail.api.mail.IMailRegister
-import me.neon.mail.common.IMailEmptyImpl
+import me.neon.mail.common.MailEmptyImpl
 import me.neon.mail.service.channel.RedisConfig
 import me.neon.mail.service.sql.ConfigSql
 import org.bukkit.Bukkit
@@ -41,10 +41,13 @@ object NeonMailLoader {
     private val expiryRegex: Regex = Regex("\\d+?(?i)(d|h|m|s|天|时|分|秒)\\s?")
     var typeTranslate: MutableMap<String, String> = mutableMapOf()
         private set
+    var smtpTranslate: MutableMap<String, String> = mutableMapOf()
+        private set
     var inputCheck: MutableList<Regex> = mutableListOf()
         private set
 
     internal val clusterId: String = Bukkit.getPort().toString()
+
 
     @Config(value = "settings.yml", autoReload = true)
     lateinit var config: ConfigFile
@@ -52,6 +55,8 @@ object NeonMailLoader {
     lateinit var redisConfig: RedisConfig
         private set
     lateinit var sqlConfig: ConfigSql
+        private set
+    var useSmtp: Boolean = false
         private set
     @ConfigNode("debug", bind = "settings.yml")
     var deBug: Boolean = false
@@ -78,20 +83,22 @@ object NeonMailLoader {
         config.onReload(::reload)
         reload()
     }
+
     fun reload() {
         redisConfig = config.getObject("Redis", false)
         sqlConfig = config.getObject("data_storage", false)
+        useSmtp = config.getBoolean("smtp.use")
         typeTranslate.putAll(config.getMap("typeTranslate"))
-        inputCheck = mutableListOf()
+        smtpTranslate.putAll(config.getMap("smtp.map"))
         inputCheck.addAll(config.getStringList("inputCheck.local").map { Regex(it)})
         initCloud(config.getStringList("inputCheck.cloud"))
     }
 
     @Awake(LifeCycle.ENABLE)
     private fun register() {
-        IMailNormalImpl(IMailRegister.console, IMailRegister.console, IMailRegister.console)
+        MailNormalImpl(IMailRegister.console, IMailRegister.console, IMailRegister.console)
             .register()
-        IMailEmptyImpl(IMailRegister.console, IMailRegister.console, IMailRegister.console)
+        MailEmptyImpl(IMailRegister.console, IMailRegister.console, IMailRegister.console)
             .register()
     }
 

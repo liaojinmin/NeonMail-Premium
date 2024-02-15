@@ -2,7 +2,7 @@ package me.neon.mail.common
 
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.api.mail.IMailState
-import taboolib.common.platform.ProxyPlayer
+import org.bukkit.entity.Player
 
 /**
  * NeonMail-Premium
@@ -13,7 +13,7 @@ import taboolib.common.platform.ProxyPlayer
  */
 class DataTypeEmpty: IMailDataType {
 
-    override fun getAppendixInfo(player: ProxyPlayer?, pad: String, refresh: Boolean): String {
+    override fun getAppendixInfo(player: Player?, pad: String, refresh: Boolean): String {
         return pad + IMailState.Text.state
     }
 

@@ -5,7 +5,6 @@ import me.neon.mail.NeonMailLoader
 import me.neon.mail.service.packet.AbstractPacket
 import me.neon.mail.service.packet.IPacket
 import org.bukkit.Bukkit
-import taboolib.platform.util.bukkitPlugin
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -33,13 +32,13 @@ class PluginChannel: ChannelInit() {
         out.write(b)
         Bukkit.getOnlinePlayers()
             .first()
-            .sendPluginMessage(bukkitPlugin, bungeeCord, out.toByteArray())
+            .sendPluginMessage(NeonMailLoader.plugin, bungeeCord, out.toByteArray())
     }
 
     override fun onStart() {
         logger.log(Level.INFO, "使用插件消息通道进行通信...")
-        Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, bungeeCord)
-        Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, bungeeCord) { channel, player, var3 ->
+        Bukkit.getMessenger().registerOutgoingPluginChannel(NeonMailLoader.plugin, bungeeCord)
+        Bukkit.getMessenger().registerIncomingPluginChannel(NeonMailLoader.plugin, bungeeCord) { channel, player, var3 ->
             if (channel == "BungeeCord") {
                 val input = ByteStreams.newDataInput(var3)
                 val subChannel = input.readUTF()

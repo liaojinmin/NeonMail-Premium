@@ -1,7 +1,7 @@
 package me.neon.mail.hook
 
+import me.neon.mail.libs.NeonLibsLoader
 import org.bukkit.plugin.Plugin
-import taboolib.platform.util.bukkitPlugin
 
 
 /**
@@ -39,8 +39,9 @@ class ProviderRegister<T> {
 
         private val providerRegister: ProviderRegister<HookPlugin> = ProviderRegister()
 
-        val points: RegistryObject<HookPoints>? = providerRegister.register(HookPoints::class.java, bukkitPlugin) { HookPoints().getImpl() }
+        val points: RegistryObject<HookPoints>? = providerRegister.register(HookPoints::class.java, NeonLibsLoader.pluginId) { HookPoints().getImpl() }
 
+        val money: RegistryObject<HookMoney>? = providerRegister.register(HookMoney::class.java, NeonLibsLoader.pluginId) { HookMoney().getImpl() }
         fun test(): RegistryObject<HookPoints>? {
             return providerRegister.get(HookPoints::class.java)
         }

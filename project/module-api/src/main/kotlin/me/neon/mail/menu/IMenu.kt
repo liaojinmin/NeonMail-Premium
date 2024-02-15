@@ -2,7 +2,7 @@ package me.neon.mail.menu
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import taboolib.module.ui.type.Linked
+
 
 /**
  * NeonMail-Premium
@@ -23,7 +23,7 @@ interface IMenu {
 
     fun getInventory(): Inventory
 
-    fun <T> Linked<T>.initMenu() {
+    fun <T> me.neon.mail.libs.taboolib.ui.type.Linked<T>.initMenu() {
         map(*menuData.layout)
         rows(menuData.layout.size)
         slots(menuData.getCharSlotIndex('@'))

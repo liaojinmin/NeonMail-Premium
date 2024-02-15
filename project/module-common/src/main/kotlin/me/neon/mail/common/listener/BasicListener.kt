@@ -2,10 +2,10 @@ package me.neon.mail.common.listener
 
 import me.neon.mail.ServiceManager
 import me.neon.mail.ServiceManager.waitDTO
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.adaptPlayer
 
 /**
  * NeonMail-Premium
@@ -14,14 +14,14 @@ import taboolib.common.platform.function.adaptPlayer
  * @author 老廖
  * @since 2024/1/2 22:22
  */
-object BasicListener {
+class BasicListener: Listener {
 
-    @SubscribeEvent
+    @EventHandler
     fun join(event: PlayerJoinEvent) {
-        adaptPlayer(event.player).waitDTO()
+        event.player.waitDTO()
     }
 
-    @SubscribeEvent
+    @EventHandler
     fun quit(event: PlayerQuitEvent) {
         ServiceManager.savePlayerData(event.player.uniqueId, true)
     }

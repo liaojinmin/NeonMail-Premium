@@ -5,6 +5,7 @@ dependencies {
     compileOnly(project(":project:module-hook"))
     compileOnly(project(":project:module-api"))
     compileOnly(project(":project:module-smtp"))
+    compileOnly(project(":project:module-libs"))
 
 
     compileOnly("ink.ptms.core:v11701:11701-minimize:mapped")

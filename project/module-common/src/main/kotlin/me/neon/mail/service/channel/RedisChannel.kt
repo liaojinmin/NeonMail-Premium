@@ -1,13 +1,14 @@
 package me.neon.mail.service.channel
 
+import me.neon.mail.NeonMailLoader
 import me.neon.mail.service.packet.IPacket
 import me.neon.mail.service.packet.AbstractPacket
+import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitTask
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
 import redis.clients.jedis.JedisPubSub
-import taboolib.common.platform.function.submitAsync
-import taboolib.common.platform.service.PlatformExecutor
 import java.util.logging.Level
 
 /**
@@ -18,7 +19,7 @@ class RedisChannel(
     private val config: RedisConfig
 ): ChannelInit() {
 
-    private var subscribeTask: PlatformExecutor.PlatformTask? = null
+    private var subscribeTask: BukkitTask? = null
 
     private val jedisPool by lazy {
         if (config.password.isEmpty()) {
@@ -43,13 +44,13 @@ class RedisChannel(
 
     override fun onStart() {
         subscribeTask?.cancel()
-        subscribeTask = submitAsync {
+        subscribeTask = Bukkit.getScheduler().runTaskAsynchronously(NeonMailLoader.plugin, Runnable {
             getRedisConnection().use {
                 if (it.isConnected) {
                     logger.log(Level.INFO, "serviceMessage 消息通道注册成功")
                 } else {
                     logger.log(Level.WARNING, "无法与 Redis 服务器建立连接")
-                    return@submitAsync
+                    return@Runnable
                 }
                 it.subscribe(object : JedisPubSub() {
                     // message = 1~server&data~data
@@ -58,7 +59,7 @@ class RedisChannel(
                     }
                 }, serviceChannel)
             }
-        }
+        })
     }
 
     override fun onClose() {

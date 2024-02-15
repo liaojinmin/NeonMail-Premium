@@ -5,28 +5,21 @@ import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.hook.ProviderRegister
-import me.neon.mail.menu.IDraftEdite
-import me.neon.mail.menu.MenuData
-import me.neon.mail.menu.MenuIcon
-import me.neon.mail.menu.MenuLoader
 import me.neon.mail.ServiceManager.updateToSql
+import me.neon.mail.hook.HookPlugin
+import me.neon.mail.libs.taboolib.chat.cancelNextChat
+import me.neon.mail.libs.taboolib.chat.nextChatInTick
+import me.neon.mail.libs.taboolib.lang.sendLang
+import me.neon.mail.libs.taboolib.ui.ClickEvent
+import me.neon.mail.libs.taboolib.ui.buildMenu
+import me.neon.mail.libs.taboolib.ui.type.Linked
+import me.neon.mail.libs.utils.io.syncRunner
+import me.neon.mail.libs.utils.replacePlaceholder
+import me.neon.mail.menu.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import taboolib.common.platform.ProxyPlayer
-import taboolib.common.platform.function.submit
-import taboolib.module.kether.isInt
-import taboolib.module.nms.getName
-import taboolib.module.ui.ClickEvent
-import taboolib.module.ui.buildMenu
-import taboolib.module.ui.type.Linked
-import taboolib.platform.compat.replacePlaceholder
-import taboolib.platform.compat.withdrawBalance
-import taboolib.platform.util.cancelNextChat
-import taboolib.platform.util.inputBook
-import taboolib.platform.util.nextChatInTick
-import taboolib.platform.util.sendLang
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -52,7 +45,6 @@ data class DataTypeNormal(
         var bs = 0
         var index = 0
         if (money > 0) {
-            NeonMailLoader.debug("解析金币值变量 -> $money")
             str.append(pad).append(
                 NeonMailLoader.mailDisAppend
                     .replace("{0}", "金币")
@@ -60,7 +52,6 @@ data class DataTypeNormal(
             bs++
         }
         if (points > 0) {
-            NeonMailLoader.debug("解析点券值变量 -> $points")
             str.append(pad).append(
                 NeonMailLoader.mailDisAppend
                     .replace("{0}", "点券")
@@ -69,7 +60,6 @@ data class DataTypeNormal(
         }
         if (command.isNotEmpty()) {
             if (command[0].isNotEmpty()) {
-                NeonMailLoader.debug("解析指令值变量 -> $command")
                 str.append(pad).append(
                     NeonMailLoader.mailDisAppend
                         .replace("{0}", "指令包")
@@ -85,7 +75,7 @@ data class DataTypeNormal(
             for (stack in itemStacks) {
                 val meta = stack.itemMeta
                 if (meta != null && bs < 6) {
-                    val manes = stack.getName()
+                    val manes = stack.i18NDisplayName!!
                     if (manes != "NO_LOCALE") {
                         str.append(pad).append(
                             NeonMailLoader.mailDisAppend
@@ -95,6 +85,7 @@ data class DataTypeNormal(
                     } else {
                         index++
                     }
+                    TODO()
                 }
                 bs++
             }
@@ -107,7 +98,7 @@ data class DataTypeNormal(
         return str.toString()
     }
 
-    override fun getAppendixInfo(player: ProxyPlayer?, pad: String, refresh: Boolean): String {
+    override fun getAppendixInfo(player: Player?, pad: String, refresh: Boolean): String {
         val text: String
         if (refresh) {
             text = getAppendixInfo(pad)
@@ -139,18 +130,18 @@ data class DataTypeNormal(
                     player.nextChatInTick(400, {
                         if (it.equals("cancel", ignoreCase = true)) {
                             player.cancelNextChat(false)
-                        } else if (it.isInt()) {
+                        } else if (it.toIntOrNull() != null) {
                             val a = it.toDoubleOrNull() ?: 0.0
                             if (a <= 0) {
                                 player.sendLang("邮件-编辑操作-输入类型错误")
                             } else {
-                                if (edite.admin || player.withdrawBalance(a).transactionSuccess()) {
+                                if (edite.admin || ProviderRegister.money?.value?.hasTakeMoney(player, a) == true) {
                                     money = a.toInt()
-                                    submit { edite.openMenu() }
+                                    syncRunner { edite.openMenu() }
                                     builder.updateToSql()
                                 } else {
                                     player.sendLang("邮件-编辑操作-金币不足")
-                                    submit { edite.openMenu() }
+                                    syncRunner { edite.openMenu() }
                                 }
                             }
                         } else {
@@ -169,7 +160,7 @@ data class DataTypeNormal(
                         player.nextChatInTick(400, {
                             if (it.equals("cancel", ignoreCase = true)) {
                                 player.cancelNextChat(false)
-                            } else if (it.isInt()) {
+                            } else if (it.toIntOrNull() != null) {
                                 // 判断玩家点券是否足够
                                 val a = it.toIntOrNull() ?: 0
                                 if (a <= 0) {
@@ -177,11 +168,11 @@ data class DataTypeNormal(
                                 } else {
                                     if (edite.admin || api.value.take(player, a)) {
                                         points = a
-                                        submit { edite.openMenu() }
+                                        syncRunner { edite.openMenu() }
                                         builder.updateToSql()
                                     } else {
                                         player.sendLang("邮件-编辑操作-点券不足")
-                                        submit { edite.openMenu() }
+                                        syncRunner { edite.openMenu() }
                                     }
                                 }
                             } else {
@@ -198,22 +189,28 @@ data class DataTypeNormal(
                         // 修改指令
                         player.closeInventory()
                         player.sendLang("邮件-编辑操作-指令")
-                        player.inputBook("Input the required command.", true, command) {
-                            if (it.isNotEmpty()) {
-                                command.clear()
-                                command.addAll(it)
-                                builder.updateToSql()
+                        player.nextChatInTick(800, {
+                            if (it.equals("cancel", ignoreCase = true)) {
+                                player.cancelNextChat(false)
+                            } else {
+                                if (it.isNotEmpty()) {
+                                    command.clear()
+                                    command.addAll(it.split(";"))
+                                    builder.updateToSql()
+                                }
+                                edite.openMenu()
                             }
-                            edite.openMenu()
-                        }
+                        })
                     }
                 } else ItemStack(Material.AIR) to {}
             }
             '4' -> {
+
                 icon.parseItems(player, "[itemStacks]" to parseItemInfo(player)) to {
                     // 修改物品
-                    MailItemEditMenu(player, builder,this@DataTypeNormal, edite).openMenu()
+                    MailItemEditMenu(player, builder, this@DataTypeNormal, edite).openMenu()
                 }
+
             }
             else -> {
                 icon.parseItems(player) to {
@@ -229,10 +226,14 @@ data class DataTypeNormal(
             for (stack in itemStacks) {
                 val meta = stack.itemMeta
                 if (meta != null) {
-                    val manes = stack.getName(player)
+                    val manes = stack.i18NDisplayName!!
                     list.add(NeonMailLoader.mailDisAppend
                         .replace("{0}", manes)
-                        .replace("{1}", (stack.amount).toString()))
+                        .replace("{1}", (stack.amount).toString())
+                        // 剔除 ; 内置分割符，这里不需要
+                        .replace(";", "")
+                    )
+                    TODO()
                 }
             }
         }
@@ -240,15 +241,14 @@ data class DataTypeNormal(
     }
 
 
-    // TODO: 这里需要不锁定玩家点击 
     class MailItemEditMenu(
         private val player: Player,
         private val builders: IDraftBuilder,
-        private val type: IMailDataType,
+        private val type: DataTypeNormal,
         private val edite: IDraftEdite,
     ) {
 
-        private val menuData: MenuData = MenuLoader.itemEditeMenu
+        private val menuData: MenuData = MenuLoader.getMenuData(MenuType.ItemEdite)
 
         fun openMenu() {
             player.openInventory(getInventory())
@@ -262,15 +262,37 @@ data class DataTypeNormal(
                 rows(menuData.layout.size)
                 slots(menuData.getCharSlotIndex('@'))
                 elements {
-                    // TODO("标记，未验证玩家取走物品后列表是否更新")
-                    if (type is DataTypeNormal) {
-                        type.itemStacks
-                    } else emptyList()
+                    type.itemStacks
                 }
 
                 onGenerate { _, element, _, _ ->  element }
 
+                menuLocked(false)
+
                 onClick(false)
+
+                onClick(false) {
+                    if (it.rawSlot in 45..80) return@onClick
+                    if (it.slot != '@') {
+                        it.isCancelled = true
+                    }
+                }
+
+                onClose {
+                    var update = false
+                    if (type.itemStacks.isNotEmpty()) {
+                        update = true
+                        type.itemStacks.clear()
+                    }
+                    menuData.getCharSlotIndex('@').forEach { index ->
+                        val item = it.inventory.getItem(index)
+                        if (item != null && item.type != Material.AIR) {
+                            update = true
+                            type.itemStacks.add(item)
+                        }
+                    }
+                    if (update) builders.updateToSql()
+                }
 
                 menuData.icon.forEach { (key, value) ->
                     when (key) {
@@ -278,7 +300,6 @@ data class DataTypeNormal(
                             set(key, value.parseItems(player)) {
                                 isCancelled = true
                                 edite.openMenu()
-                                builders.updateToSql()
                             }
                         }
                         else -> {

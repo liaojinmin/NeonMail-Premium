@@ -2,8 +2,8 @@ package me.neon.mail.api.mail
 
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
-import taboolib.common.platform.ProxyPlayer
-import taboolib.library.xseries.XMaterial
+import org.bukkit.Material
+import org.bukkit.entity.Player
 import java.util.*
 
 /**
@@ -28,7 +28,7 @@ interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
 
 
     val permission: String
-    val mainIcon: XMaterial
+    val mainIcon: Material
     val mailType: String
     val plugin: String
 
@@ -40,9 +40,9 @@ interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
      */
     fun sendGlobalMail()
 
-    fun checkClaimCondition(player: ProxyPlayer): Boolean
+    fun checkClaimCondition(player: Player): Boolean
 
-    fun giveAppendix(player: ProxyPlayer): Boolean
+    fun giveAppendix(player: Player): Boolean
 
     fun getMailClassType(): Class<out IMail<T>>
 

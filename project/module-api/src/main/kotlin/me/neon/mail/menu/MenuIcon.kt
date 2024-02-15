@@ -1,10 +1,11 @@
 package me.neon.mail.menu
 
+import me.neon.mail.libs.utils.buildItem
+import me.neon.mail.libs.utils.replacePlaceholder
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import taboolib.library.xseries.XMaterial
-import taboolib.platform.compat.replacePlaceholder
-import taboolib.platform.util.buildItem
+
 
 /**
  * NeonMail-Premium
@@ -15,7 +16,7 @@ import taboolib.platform.util.buildItem
  */
 data class MenuIcon(
     val char: Char,
-    val mats: XMaterial,
+    val mats: Material,
     val model: Int,
     val name: String,
     val lore: List<String>,

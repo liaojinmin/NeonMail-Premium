@@ -1,6 +1,6 @@
 package me.neon.mail.api.mail
 
-import taboolib.common.platform.ProxyPlayer
+import org.bukkit.entity.Player
 
 /**
  * NeonMail-Premium
@@ -11,7 +11,10 @@ import taboolib.common.platform.ProxyPlayer
  */
 interface IMailDataType {
 
-    fun getAppendixInfo(player: ProxyPlayer?, pad: String = "", refresh: Boolean = false): String
+
+
+
+    fun getAppendixInfo(player: Player?, pad: String = "", refresh: Boolean = false): String
 
     fun getAppendixInfo(pad: String = ""): String
 

@@ -6,14 +6,13 @@ import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailRegister
 import me.neon.mail.api.mail.IMailState
-import me.neon.mail.common.DraftBuilderimpl
+import me.neon.mail.common.DraftBuilderImpl
 import me.neon.mail.common.PlayerDataImpl
 import me.neon.mail.service.enums.TABMysql
 import me.neon.mail.service.enums.TABSqlite
 import me.neon.mail.service.enums.TABStatement
 import me.neon.mail.service.sql.*
-import taboolib.common.platform.ProxyPlayer
-import taboolib.common.platform.function.warning
+import org.bukkit.entity.Player
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
@@ -56,39 +55,41 @@ class SQLImpl {
                         }
                         statement.executeBatch()
                     }
-                    prepareStatement(
-                        "show index from $mailTAB"
-                    ).action {
-                        it.executeQuery().get { res ->
-                            var create = true
-                            while (res.next()) {
-                                if (res.getString("Key_name") == "idx_sender_target") {
-                                    NeonMailLoader.debug("索引 idx_sender_target 已存在，不再创建...")
-                                    create = false
-                                    break
+                    if (dataSub is Mysql) {
+                        prepareStatement(
+                            "show index from $mailTAB"
+                        ).action {
+                            it.executeQuery().get { res ->
+                                var create = true
+                                while (res.next()) {
+                                    if (res.getString("Key_name") == "idx_sender_target") {
+                                        NeonMailLoader.debug("索引 idx_sender_target 已存在，不再创建...")
+                                        create = false
+                                        break
+                                    }
                                 }
-                            }
-                            if (create) {
-                                NeonMailLoader.debug("索引 idx_sender_target 不已存在，正在创建...")
-                                createStatement().execute(TABMysql.MAIL_TAB_INDEX_1.tab)
+                                if (create) {
+                                    NeonMailLoader.debug("索引 idx_sender_target 不已存在，正在创建...")
+                                    createStatement().execute(TABMysql.MAIL_TAB_INDEX_1.tab)
+                                }
                             }
                         }
-                    }
-                    prepareStatement(
-                        "show index from $draftTAB"
-                    ).action {
-                        it.executeQuery().get { res ->
-                            var create = true
-                            while (res.next()) {
-                                if (res.getString("Key_name") == "idx_sender") {
-                                    NeonMailLoader.debug("索引 idx_sender 已存在，不再创建...")
-                                    create = false
-                                    break
+                        prepareStatement(
+                            "show index from $draftTAB"
+                        ).action {
+                            it.executeQuery().get { res ->
+                                var create = true
+                                while (res.next()) {
+                                    if (res.getString("Key_name") == "idx_sender") {
+                                        NeonMailLoader.debug("索引 idx_sender 已存在，不再创建...")
+                                        create = false
+                                        break
+                                    }
                                 }
-                            }
-                            if (create) {
-                                NeonMailLoader.debug("索引 idx_sender 不已存在，正在创建...")
-                                createStatement().execute(TABMysql.DRAFT_TAB_INDEX_1.tab)
+                                if (create) {
+                                    NeonMailLoader.debug("索引 idx_sender 不已存在，正在创建...")
+                                    createStatement().execute(TABMysql.DRAFT_TAB_INDEX_1.tab)
+                                }
                             }
                         }
                     }
@@ -127,67 +128,6 @@ class SQLImpl {
         }
     }
 
-    /**
-     * **单个邮件的删除操作**
-     *
-     * @param player 玩家UUID
-     * @param mail 邮件实体
-     */
-    @Deprecated("不确定是否使用")
-    fun deleteMail(player: UUID, mail: IMail<*>) {
-        getConnection {
-            try {
-                autoCommit = false
-                this.prepareStatement(
-                    "SELECT `sd`,`td`,`sender`,`target` FROM $mailTAB WHERE uuid=? LIMIT 1"
-                ).action {
-                    val mailID = mail.uuid.toString()
-                    it.setString(1, mailID)
-                    it.executeQuery().get { res ->
-                        if (res.next()) {
-                            val sd = res.getInt("sd")
-                            val td = res.getInt("td")
-                            if (sd == 1 && td == 1) {
-                                this.prepareStatement(
-                                    "DELETE FROM $mailTAB WHERE `uuid`=? LIMIT 1"
-                                ).action { a2 ->
-                                    a2.setString(1, mailID)
-                                    a2.executeUpdate()
-                                }
-                            } else {
-                                if (player.toString() == res.getString("sender")) {
-                                    if (sd == 1) throw RuntimeException("重复的删除请求... ${mail.uuid}")
-                                    this.prepareStatement(
-                                        "UPDATE $mailTAB SET `sd`=? WHERE `uuid`=? LIMIT 1"
-                                    ).action { a2 ->
-                                        a2.setInt(1, 1)
-                                        a2.setString(2, mailID)
-                                        a2.executeUpdate()
-                                    }
-                                } else {
-                                    if (td == 1) throw RuntimeException("重复的删除请求... ${mail.uuid}")
-                                    this.prepareStatement(
-                                        "UPDATE $mailTAB SET `td`=? WHERE `uuid`=? LIMIT 1"
-                                    ).action { a2 ->
-                                        a2.setInt(1, 1)
-                                        a2.setString(2, mailID)
-                                        a2.executeUpdate()
-                                    }
-                                }
-                            }
-                            commit()
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                rollback()
-                NeonMailLoader.debug("sql 事务已回滚，操作失败...")
-                e.printStackTrace()
-            } finally {
-                autoCommit = true
-            }
-        }
-    }
 
     /**
      * 批量插入待实现
@@ -250,8 +190,7 @@ class SQLImpl {
         var mail: IMail<*>? = null
         getConnection {
             this.prepareStatement(
-                "SELECT `uuid`,`sender`,`target`,`title`,`context`,`state`,`senderTimer`,`collectTimer`,`type`,`td`,`sd`,`data` " +
-                "FROM $mailTAB WHERE `uuid`=? LIMIT 1"
+                    TABStatement.SELECT_MAIL.statement
             ).action {
                 it.setUUID(1, uuid)
                 it.executeQuery().get { res ->
@@ -259,7 +198,7 @@ class SQLImpl {
                         if (res.getInt("sd") < 1 && res.getInt("td") < 1) {
                             mail = res.getMailData()
                         } else {
-                            warning("异常的邮件查询，这个邮件应当被标记删除 $uuid")
+                            NeonMailLoader.plugin.logger.warning("异常的邮件查询，这个邮件应当被标记删除 $uuid")
                         }
                     }
                 }
@@ -276,8 +215,7 @@ class SQLImpl {
         val t = mutableListOf<IMail<*>>()
         getConnection {
             this.prepareStatement(
-                "SELECT `uuid`,`sender`,`target`,`title`,`context`,`state`,`senderTimer`,`collectTimer`,`type`,`td`,`sd`,`data` " +
-                        "FROM $mailTAB WHERE (sender=? AND sd=0) OR (target=? AND td=0) LIMIT ?"
+                TABStatement.SELECT_MAIL_LIST.statement
             ).action {
                 val k = player.toString()
                 it.setString(1, k)
@@ -310,7 +248,8 @@ class SQLImpl {
         getConnection {
             try {
                 autoCommit = false
-                this.prepareStatement("DELETE FROM $draftTAB WHERE `uuid`=? LIMIT 1"
+                this.prepareStatement(
+                    TABStatement.DELETE_DRAFTS.statement
                 ).action {
                     edite.forEach { mail ->
                         it.setUUID(1, mail.uuid)
@@ -328,7 +267,7 @@ class SQLImpl {
                 }
             } catch (e: Exception) {
                 rollback()
-                warning("deleteDrafts() sql 事务已回滚，操作失败...")
+                NeonMailLoader.plugin.logger.warning("deleteDrafts() sql 事务已回滚，操作失败...")
                 e.printStackTrace()
                 // 返回删除失败
                 callBack.invoke(0)
@@ -338,23 +277,17 @@ class SQLImpl {
         }
     }
 
+
     fun updateDrafts(edite: List<IDraftBuilder>) {
         if (edite.isEmpty()) return
         getConnection {
             try {
                 autoCommit = false
                 this.prepareStatement(
-                    """
-                    INSERT INTO $draftTAB (`uuid`, `sender`, `type`, `title`, `context`,`global`, `data`)
-                    VALUES (?, ?, ?, ?, ?, ?,?)
-                    ON DUPLICATE KEY UPDATE 
-                    `sender` = VALUES(`sender`), 
-                    `type` = VALUES(`type`), 
-                    `title` = VALUES(`title`), 
-                    `context` = VALUES(`context`),
-                    `global` = VALUES(`global`),
-                    `data` = VALUES(`data`);
-            """).action {
+                    if (dataSub is Mysql)
+                        TABStatement.UPDATE_DRAFTS_MYSQL.statement
+                    else
+                        TABStatement.UPDATE_DRAFTS_SQLITE.statement).action {
                     edite.forEach { draft ->
                         it.setUUID(1, draft.uuid)
                         it.setUUID(2, draft.sender)
@@ -362,7 +295,7 @@ class SQLImpl {
                         it.setString(4, draft.title)
                         it.setStringList(5, draft.context)
                         it.setBoolean(6, draft.checkGlobalModel())
-                        it.setBytes(7, DraftBuilderimpl.serialize(draft.getTargets()))
+                        it.setBytes(7, DraftBuilderImpl.serialize(draft.getTargets()))
                         it.addBatch()
                     }
                     it.executeBatch()
@@ -370,7 +303,7 @@ class SQLImpl {
                 }
             } catch (e: Exception) {
                 rollback()
-                warning("updateDrafts() sql 事务已回滚，操作失败...")
+                NeonMailLoader.plugin.logger.warning("updateDrafts() sql 事务已回滚，操作失败...")
                 e.printStackTrace()
             } finally {
               autoCommit = true
@@ -393,9 +326,9 @@ class SQLImpl {
                             val title = res.getString("title")
                             val context = res.getStringList("context").toMutableList()
                             val global = res.getBoolean("global")
-                            val data = DraftBuilderimpl.deserialize(res.getBytes("data"), im.getDataClassType())
-                            list.add(DraftBuilderimpl(player, type, uuid, title, context, global, data))
-                        } ?: warning("在获取草稿邮件时发生以外，邮件种类缺少 -> $type")
+                            val data = DraftBuilderImpl.deserialize(res.getBytes("data"), im.getDataClassType())
+                            list.add(DraftBuilderImpl(player, type, uuid, title, context, global, data))
+                        } ?: NeonMailLoader.plugin.logger.warning("在获取草稿邮件时发生以外，邮件种类缺少 -> $type")
                     }
                     callBack.invoke(list)
                 }
@@ -439,7 +372,7 @@ class SQLImpl {
         }
     }
 
-    fun selectPlayerData(player: ProxyPlayer, callBack: (PlayerData) -> Unit) {
+    fun selectPlayerData(player: Player, callBack: (PlayerData) -> Unit) {
         if (dataSub.isActive) {
             getConnection {
                 this.prepareStatement(

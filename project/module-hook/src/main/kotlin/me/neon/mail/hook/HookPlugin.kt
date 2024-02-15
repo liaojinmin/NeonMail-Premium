@@ -2,7 +2,6 @@ package me.neon.mail.hook
 
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
-import taboolib.common.platform.function.console
 
 /**
  * NeonMail-Premium
@@ -17,7 +16,7 @@ abstract class HookPlugin {
 
     fun checkHook(plugin: String): Plugin? {
         return Bukkit.getPluginManager().getPlugin(plugin)?.also {
-            console().sendMessage("§8[§bNeon§9Mail§8-§ePremium§8] §7软依赖 §f$plugin §7已兼容...")
+            Bukkit.getConsoleSender().sendMessage("§8[§bNeon§9Mail§8-§ePremium§8] §7软依赖 §f$plugin §7已兼容...")
         }
     }
 

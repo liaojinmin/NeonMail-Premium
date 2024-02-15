@@ -2,7 +2,6 @@ package me.neon.mail.menu
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import taboolib.platform.util.sendLang
 
 /**
  * NeonMail-Premium
@@ -20,7 +19,6 @@ interface IDraftEdite {
     fun openMenu() {
         player.openInventory(getInventory())
     }
-
 
     fun getInventory(): Inventory
 }

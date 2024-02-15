@@ -4,7 +4,7 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
-rootProject.name = "NeonMail-Premium"
+rootProject.name = "NeonMail"
 
 include("plugin")
 include("project:module-hook")
@@ -12,4 +12,4 @@ include("project:module-smtp")
 include("project:module-api")
 include("project:module-common")
 include("project:module-menu")
-include("project:platform-bukkit")
+include("project:module-libs")

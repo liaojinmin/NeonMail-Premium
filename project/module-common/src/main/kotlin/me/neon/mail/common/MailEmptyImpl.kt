@@ -4,12 +4,12 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
+import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
-import taboolib.common.platform.ProxyPlayer
-import taboolib.common.platform.function.pluginId
-import taboolib.library.xseries.XMaterial
+import org.bukkit.Material
+import org.bukkit.entity.Player
 import java.lang.reflect.Type
 import java.util.*
 
@@ -28,11 +28,11 @@ class MailEmptyImpl(
 ): IMailAbstract<DataTypeEmpty>() {
 
     override val permission: String = "mail.extend.text"
-    override val mainIcon: XMaterial = XMaterial.BOOK
-    override val mailType: String = "纯文本"
-    override val plugin: String = pluginId
+    override val mainIcon: Material = Material.BOOK
+    override val mailType: String = NeonMailLoader.typeTranslate["纯文本"] ?: "纯文本"
+    override val plugin: String = NeonMailLoader.plugin.name
 
-    override fun giveAppendix(player: ProxyPlayer): Boolean {
+    override fun giveAppendix(player: Player): Boolean {
         return true
     }
 
@@ -60,7 +60,7 @@ class MailEmptyImpl(
         return JsonObject()
     }
 
-    override fun checkClaimCondition(player: ProxyPlayer): Boolean {
+    override fun checkClaimCondition(player: Player): Boolean {
         return false
     }
 

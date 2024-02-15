@@ -1,7 +1,6 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val taboolibVersion: String by project
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
@@ -33,26 +32,11 @@ subprojects {
     dependencies {
         compileOnly(kotlin("stdlib"))
 
-        compileOnly("io.izzel.taboolib:common:$taboolibVersion")
-        implementation("io.izzel.taboolib:common-5:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-chat:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-configuration:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-lang:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-nms:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-nms-util:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-ui:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-kether:$taboolibVersion")
-        implementation("io.izzel.taboolib:module-metrics:$taboolibVersion")
-        implementation("io.izzel.taboolib:platform-bukkit:$taboolibVersion")
-
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
 
         implementation("redis.clients:jedis:4.2.2")
         implementation("com.zaxxer:HikariCP:4.0.3")
-        implementation("javax.mail:javax.mail-api:1.6.2") { isTransitive = false }
-        implementation("javax.activation:activation:1.1.1") { isTransitive = false }
-
 
         // server
         compileOnly("ink.ptms.core:v11604:11604")
@@ -78,4 +62,5 @@ subprojects {
 gradle.buildFinished {
     buildDir.deleteRecursively()
 }
+
 

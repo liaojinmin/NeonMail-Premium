@@ -1,6 +1,7 @@
 package me.neon.mail.service.packet
 
 import me.neon.mail.NeonMailLoader
+import org.bukkit.Bukkit
 import java.util.UUID
 
 /**
@@ -54,7 +55,7 @@ abstract class AbstractPacket: IPacket {
         else {
             build.append(getPacketIndexId())
                 .append(packetSplit)
-                .append(NeonMailLoader.clusterId)
+                .append(Bukkit.getServer().port.toString())
                 .append(headerSplit)
                 .append(this.builder)
         }

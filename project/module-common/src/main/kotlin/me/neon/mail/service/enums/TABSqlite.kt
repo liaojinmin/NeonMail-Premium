@@ -13,7 +13,7 @@ enum class TABSqlite(val tab: String) {
     // 邮件表
     MAIL_TAB(
         "CREATE TABLE IF NOT EXISTS ${SQLImpl.mailTAB} (" +
-                " `uuid`            CHAR(36)        UNIQUE," +
+                " `uuid`            CHAR(36)        UNIQUE PRIMARY KEY," +
                 " `sender`          CHAR(36)        NOT NULL," +
                 " `target`          CHAR(36)        NOT NULL," +
                 " `title`           VARCHAR(255)    NOT NULL," +
@@ -25,31 +25,29 @@ enum class TABSqlite(val tab: String) {
                 " `sd`              int             DEFAULT `0`," +
                 " `td`              int             DEFAULT `0`," +
                 " `data`            TIMESTAMP       NOT NULL," +
-                " time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                " PRIMARY KEY (uuid)" +
+                " `time` DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");"
     ),
     // 用户
     USER_TAB(
         "CREATE TABLE IF NOT EXISTS ${SQLImpl.userTAB} (" +
-                " `uuid`    TEXT            NOT NULL UNIQUE," +
+                " `uuid`    TEXT            NOT NULL UNIQUE PRIMARY KEY," +
                 " `user`    VARCHAR(16)     NOT NULL," +
                 " `mail`    VARCHAR(36)     NOT NULL," +
                 " `data`    TEXT            NOT NULL," +
-                " PRIMARY KEY (uuid)" +
+                " `time` DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");"
     ),
     DRAFT_TAB(
         "CREATE TABLE IF NOT EXISTS ${SQLImpl.draftTAB} (" +
-                " `uuid`      TEXT             NOT NULL UNIQUE," +
+                " `uuid`      TEXT             NOT NULL UNIQUE PRIMARY KEY," +
                 " `type`      CHAR(16)         NOT NULL," +
                 " `sender`    TEXT             NOT NULL," +
                 " `title`     VARCHAR(255)     NOT NULL," +
                 " `context`   TEXT             NOT NULL," +
                 " `global`    Boolean          NOT NULL," +
                 " `data`      MEDIUMTEXT       NOT NULL," +
-                " `time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                " PRIMARY KEY (uuid)" +
+                " `time` DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");"
     ),
 }

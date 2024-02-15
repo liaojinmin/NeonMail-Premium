@@ -21,11 +21,18 @@ interface IDraftBuilder {
     var title: String
 
     val context: MutableList<String>
+
     fun checkGlobalModel(): Boolean
+
     fun senderMail()
+
     fun addTarget(uuid: UUID, dataType: IMailDataType)
+
     fun getTargets(): ConcurrentHashMap<UUID, IMailDataType>
+
     fun changeGlobalModel(): IMailDataType
+
     fun isAllowSender(): Boolean
+
     fun isAllowDeletion(): Boolean
 }

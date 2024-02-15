@@ -4,26 +4,18 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
+import me.neon.mail.NeonMailLoader
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.api.mail.IMailAbstract
 import me.neon.mail.api.mail.IMailDataType
 import me.neon.mail.hook.ProviderRegister
+import me.neon.mail.libs.taboolib.lang.sendLang
+import me.neon.mail.libs.utils.*
 import me.neon.mail.menu.MenuIcon
-import me.neon.mail.utils.deserializeItemStacks
-import me.neon.mail.utils.serializeItemStacks
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import taboolib.common.platform.ProxyPlayer
-import taboolib.common.platform.function.pluginId
-import taboolib.common.platform.function.warning
-import taboolib.library.xseries.XMaterial
-import taboolib.module.nms.MinecraftVersion
-import taboolib.platform.compat.depositBalance
-import taboolib.platform.compat.replacePlaceholder
-import taboolib.platform.type.BukkitPlayer
-import taboolib.platform.util.getEmptySlot
-import taboolib.platform.util.giveItem
-import taboolib.platform.util.sendLang
 import java.lang.reflect.Type
 import java.util.*
 
@@ -44,39 +36,38 @@ class MailNormalImpl(
 
 
     override val permission: String = "mail.extend.normal"
-    override val mailType: String = "混合邮件"
-    override val mainIcon: XMaterial = XMaterial.DIAMOND
-    override val plugin: String = pluginId
+    override val mailType: String = NeonMailLoader.typeTranslate["混合邮件"] ?: "混合邮件"
+    override val mainIcon: Material = Material.DIAMOND
+    override val plugin: String = NeonMailLoader.plugin.name
 
 
-    override fun checkClaimCondition(player: ProxyPlayer): Boolean {
+    override fun checkClaimCondition(player: Player): Boolean {
         if (data.itemStacks.isEmpty()) return true
-        val bukkitPlayer = (player as BukkitPlayer).player
-        val air = bukkitPlayer.getEmptySlot()
+
+        val air = player.getEmptySlot()
         if (air < data.itemStacks.size) {
-            bukkitPlayer.sendLang("玩家-没有足够背包格子", data.itemStacks.size-air)
+            player.sendLang("玩家-没有足够背包格子", data.itemStacks.size-air)
             return false
         }
         return true
     }
 
-    override fun giveAppendix(player: ProxyPlayer): Boolean {
-        val bukkitPlayer = (player as BukkitPlayer).player
+    override fun giveAppendix(player: Player): Boolean {
         if (data.itemStacks.isNotEmpty()) {
-            bukkitPlayer.giveItem(data.itemStacks)
+            player.giveItem(data.itemStacks)
         }
         if (data.money > 0) {
-            bukkitPlayer.depositBalance(data.money.toDouble())
+            ProviderRegister.money?.value?.giveMoney(player, data.money.toDouble())
         }
         if (data.points > 0) {
-            ProviderRegister.points?.value?.add(bukkitPlayer, data.points) ?: warning("找不到可用的点券实现系统...")
+            ProviderRegister.points?.value?.add(player, data.points) ?: NeonMailLoader.plugin.logger.warning("找不到可用的点券实现系统...")
         }
         if (data.command.isNotEmpty()) {
-            data.command.replacePlaceholder(bukkitPlayer).forEach { out ->
+            data.command.replacePlaceholder(player).forEach { out ->
                 try {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), out)
                 } catch (e: Exception) {
-                    warning("执行附件指令时发生异常 -> ${data.command}")
+                    NeonMailLoader.plugin.logger.warning("执行附件指令时发生异常 -> ${data.command}")
                     e.printStackTrace()
                 }
             }
@@ -85,9 +76,9 @@ class MailNormalImpl(
     }
 
 
-    override fun parseMailIcon(icon: MenuIcon): ItemStack {
-        val item = super.parseMailIcon(icon)
-        if (MinecraftVersion.major >= 9) {
+    override fun parseMailIcon(player: Player, icon: MenuIcon): ItemStack {
+        val item = super.parseMailIcon(player, icon)
+        if (NeonMailLoader.getUseBundle()) {
             val itemMeta = item.itemMeta
             try {
                 if (itemMeta is org.bukkit.inventory.meta.BundleMeta) {
@@ -125,7 +116,8 @@ class MailNormalImpl(
         val obj =  p0.asJsonObject
         val money = obj.get("money").asInt
         val points = obj.get("points").asInt
-        val command = obj.get("command").asString.split(",").toMutableList()
+        val cmd = obj.get("command").asString
+        val command = if (cmd.isNotEmpty()) cmd.split(",").toMutableList() else mutableListOf()
         val itemStacks = obj.get("itemStacks").asString.deserializeItemStacks()
         return DataTypeNormal(money, points, command, itemStacks)
     }
@@ -134,7 +126,7 @@ class MailNormalImpl(
         val obj = JsonObject()
         obj.addProperty("money", p0.money)
         obj.addProperty("points", p0.points)
-        obj.addProperty("command", p0.command.joinToString(",", "", ""))
+        obj.addProperty("command", if (p0.command.isEmpty()) "" else p0.command.joinToString(",", "", ""))
         obj.addProperty("itemStacks", p0.itemStacks.serializeItemStacks())
         return obj
     }

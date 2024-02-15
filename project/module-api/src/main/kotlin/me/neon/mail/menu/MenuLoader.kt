@@ -1,15 +1,14 @@
 package me.neon.mail.menu
 
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
-import taboolib.common.platform.Platform
-import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.function.console
-import taboolib.common.platform.function.warning
-import taboolib.library.xseries.XMaterial
-import taboolib.module.chat.colored
-import taboolib.module.configuration.Config
-import taboolib.module.configuration.ConfigFile
+
+import me.neon.mail.libs.NeonLibsLoader
+import me.neon.mail.libs.taboolib.chat.HexColor.colored
+import me.neon.mail.libs.utils.io.forFile
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.configuration.Configuration
+import org.bukkit.configuration.file.YamlConfiguration
+import java.io.File
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.system.measureTimeMillis
@@ -21,121 +20,76 @@ import kotlin.system.measureTimeMillis
  * @author 老廖
  * @since 2024/1/4 13:56
  */
-@PlatformSide([Platform.BUKKIT])
 object MenuLoader {
 
     private val menuClickCd: ConcurrentHashMap<UUID, Long> = ConcurrentHashMap()
+
+    private val typeMap: Map<String, MenuType>
+
+    private var menuMap: MutableMap<MenuType, MenuData> = mutableMapOf()
 
     fun addClickCD(uuid: UUID, cd: Int) {
         if (cd <= 0) return
         menuClickCd[uuid] = System.currentTimeMillis() + (cd * 1000)
     }
+
     fun isClickCD(uuid: UUID): Boolean {
         return (menuClickCd[uuid] ?: 0) >= System.currentTimeMillis()
     }
 
-    @Config(value = "menu/sender.yml", autoReload = true)
-    private lateinit var sender: ConfigFile
-
-    @Config(value = "menu/receive.yml", autoReload = true)
-    private lateinit var receive: ConfigFile
-
-    @Config(value = "menu/actions.yml", autoReload = true)
-    private lateinit var actions: ConfigFile
-
-    @Config(value = "menu/itemPreview.yml", autoReload = true)
-    private lateinit var itemPreview: ConfigFile
-
-    // edit
-    @Config(value = "menu/edits/draftBox.yml", autoReload = true)
-    private lateinit var draftBox: ConfigFile
-
-    @Config(value = "menu/edits/typeSelect.yml", autoReload = true)
-    private lateinit var typeSelect: ConfigFile
-
-    @Config(value = "menu/edits/draftMailEdite.yml", autoReload = true)
-    private lateinit var draftMailEdite: ConfigFile
-
-    @Config(value = "menu/edits/mailAppEdite.yml", autoReload = true)
-    private lateinit var mailAppEdite: ConfigFile
-
-    @Config(value = "menu/edits/playerList.yml", autoReload = true)
-    private lateinit var playerList: ConfigFile
-
-    @Config(value = "menu/edits/itemEdite.yml", autoReload = true)
-    private lateinit var itemEdite: ConfigFile
-
-    lateinit var senderMenu: MenuData
-        private set
-    lateinit var receiveMenu: MenuData
-        private set
-    lateinit var actionsMenu: MenuData
-        private set
-    lateinit var itemPreviewMenu: MenuData
-        private set
-
-    // edit
-    lateinit var draftBoxMenu: MenuData
-        private set
-    lateinit var typeSelectMenu: MenuData
-        private set
-    lateinit var draftMailEditeMenu: MenuData
-        private set
-    lateinit var mailAppEditeMenu: MenuData
-        private set
-    lateinit var playerListMenu: MenuData
-        private set
-    lateinit var itemEditeMenu: MenuData
-        private set
+    init {
+        typeMap = hashMapOf(
+            "sender" to MenuType.Sender,
+            "receive" to MenuType.Receive,
+            "actions" to MenuType.Actions,
+            "itemPreview" to MenuType.ItemPreview,
+            "draftBox" to MenuType.DraftBox,
+            "typeSelect" to MenuType.TypeSelect,
+            "draftMailEdite" to MenuType.DraftMailEdite,
+            "mailAppEdite" to MenuType.MailAppEdite,
+            "playerList" to MenuType.PlayerList,
+            "itemEdite" to MenuType.ItemEdite,
+        )
+    }
 
 
-    fun reload() {
+    fun getMenuData(type: MenuType): MenuData {
+        return menuMap[type] ?: error("找不到种类 $type 的菜单配置....")
+    }
+
+
+
+    fun loader() {
         measureTimeMillis {
-            senderMenu = loadMenu(sender)
-            receiveMenu = loadMenu(receive)
-            actionsMenu = loadMenu(actions)
-            itemPreviewMenu = loadMenu(itemPreview)
-
-            // edit
-            draftBoxMenu = loadMenu(draftBox)
-            typeSelectMenu = loadMenu(typeSelect)
-            draftMailEditeMenu = loadMenu(draftMailEdite)
-            mailAppEditeMenu = loadMenu(mailAppEdite)
-            playerListMenu = loadMenu(playerList)
-            itemEditeMenu = loadMenu(itemEdite)
-        }.also { console().sendMessage("§7加载 §f菜单配置文件 §7... §8(耗时 $it ms)") }
+            val file = File(NeonLibsLoader.pluginId.dataFolder, "menu")
+            if (!file.exists()) {
+                // create
+                createNewFile()
+            }
+            file.forFile("yml").forEach {
+                val name = it.name.substringBeforeLast(".")
+                typeMap[name]?.let { type ->
+                    menuMap[type] = loadMenu(YamlConfiguration.loadConfiguration(it))
+                }
+            }
+        }.also { Bukkit.getConsoleSender().sendMessage("§7[NeonMail] §7加载 §f菜单配置文件 §7... §8(耗时 $it ms)") }
     }
 
 
-    @Awake(LifeCycle.ENABLE)
-    private fun loader() {
-        sender.onReload { senderMenu = loadMenu(sender) }
-        receive.onReload { receiveMenu = loadMenu(receive) }
-        actions.onReload { actionsMenu = loadMenu(actions) }
-        itemPreview.onReload { itemPreviewMenu = loadMenu(itemPreview) }
-        // edit
-        draftBox.onReload { draftBoxMenu = loadMenu(draftBox) }
-        typeSelect.onReload { typeSelectMenu = loadMenu(typeSelect) }
-        draftMailEdite.onReload { draftMailEditeMenu = loadMenu(draftMailEdite) }
-        mailAppEdite.onReload { mailAppEditeMenu = loadMenu(mailAppEdite) }
-        playerList.onReload { playerListMenu = loadMenu(playerList) }
-        itemEdite.onReload { itemEditeMenu = loadMenu(itemEdite) }
-        reload()
-    }
 
 
-    private fun loadMenu(yaml: ConfigFile): MenuData {
+
+
+    private fun loadMenu(yaml: Configuration): MenuData {
         val title = yaml.getString("title")?.colored() ?: "menu"
         val layout = yaml.getStringList("layout")
         val icon = mutableMapOf<Char, MenuIcon>()
         try {
-
-
             yaml.getConfigurationSection("icons")?.let {
                 it.getKeys(false).forEach { key ->
                     val ic = MenuIcon(
                         key.first(),
-                        XMaterial.valueOf(it.getString("$key.display.mats")?.uppercase() ?: "PAPER"),
+                        Material.valueOf(it.getString("$key.display.mats")?.uppercase() ?: "PAPER"),
                         it.getInt("$key.display.model"),
                         it.getString("$key.display.name")?.colored() ?: " ",
                         it.getStringList("$key.display.lore").colored(),
@@ -144,7 +98,7 @@ object MenuLoader {
                     it.getConfigurationSection("$key.display.subIcon")?.let { cs ->
                         ic.subIcon = MenuIcon(
                             ic.char,
-                            XMaterial.valueOf(cs.getString("mats") ?: "PAPER"),
+                            Material.valueOf(cs.getString("mats") ?: "PAPER"),
                             cs.getInt("model"),
                             cs.getString("name")?.colored() ?: " ",
                             cs.getStringList("lore").colored(),
@@ -155,9 +109,27 @@ object MenuLoader {
                 }
             }
         }catch (e: Exception) {
-            e.printStackTrace()
-            warning("出错文件 -> ${yaml.name}")
+            error("出错文件 -> ${yaml.name}")
         }
         return MenuData(title, layout.toTypedArray(), icon)
     }
+
+
+    private fun createNewFile() {
+        listOf(
+            "menu/sender.yml",
+            "menu/receive.yml",
+            "menu/actions.yml",
+            "menu/itemPreview.yml",
+            "menu/edits/draftBox.yml",
+            "menu/edits/typeSelect.yml",
+            "menu/edits/draftMailEdite.yml",
+            "menu/edits/mailAppEdite.yml",
+            "menu/edits/playerList.yml",
+            "menu/edits/itemEdite.yml"
+        ).forEach {
+            NeonLibsLoader.pluginId.saveResource(it, true)
+        }
+    }
+
 }

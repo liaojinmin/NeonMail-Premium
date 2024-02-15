@@ -17,7 +17,7 @@ data_storage:
     maximum_lifetime: 1800000
     keepalive_time: 0
     connection_timeout: 5000
-Redis:
+redis:
   # 是否启用 Redis 用作跨服发送，如果不启用，默认使用插件通道。
   use: false
   # 服务器 IP

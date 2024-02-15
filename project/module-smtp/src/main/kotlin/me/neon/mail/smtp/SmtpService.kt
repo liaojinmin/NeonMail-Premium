@@ -1,14 +1,12 @@
 package me.neon.mail.smtp
 
 import me.neon.mail.api.mail.IMail
-import me.neon.mail.utils.asyncRunner
+import me.neon.mail.libs.taboolib.chat.HexColor.uncolored
+import me.neon.mail.libs.utils.io.asyncRunner
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
-import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.getProxyPlayer
-import taboolib.common.platform.function.releaseResourceFile
-import taboolib.module.chat.uncolored
+import org.bukkit.plugin.Plugin
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -24,6 +22,7 @@ import javax.mail.internet.MimeMessage
 
 
 class SmtpService(
+    private val plugin: Plugin,
     private val param: MutableMap<String, String>
 ) {
     private val account = param["account"] ?: error("找不到发件账号")
@@ -31,18 +30,21 @@ class SmtpService(
     private val personal = param["personal"] ?: "NeonMail-Premium"
     private val subjects = param["subjects"] ?: "NeonMail-收件提醒"
     private val html by lazy {
-        File(getDataFolder(), "smtp/web.html").also {
-            if (!it.exists()) releaseResourceFile("smtp/web.html", true)
+        File(plugin.dataFolder, "smtp/web.html").also {
+            if (!it.exists()) plugin.saveResource("smtp/web.html", true)
         }.toHtmlString()
     }
+
     private val bind by lazy {
-        File(getDataFolder(), "smtp/bind.html").also {
-            if (!it.exists()) releaseResourceFile("smtp/bind.html", true)
+        File(plugin.dataFolder, "smtp/bind.html").also {
+            if (!it.exists()) plugin.saveResource("smtp/bind.html", true)
         }.toHtmlString()
     }
+
     private val properties by lazy {
         Properties().apply { putAll(param) }
     }
+
     private val authenticator: Authenticator by lazy {
         object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication {
@@ -104,7 +106,7 @@ class SmtpService(
         return html.replace("{name}", player.name ?: player.uniqueId.toString())
             .replace("{title}", iMail.title.uncolored())
             .replace("{text}", iMail.context.uncolored())
-            .replace("{app}", iMail.data.getAppendixInfo(getProxyPlayer(player.uniqueId)).uncolored())
+            .replace("{app}", iMail.data.getAppendixInfo(Bukkit.getPlayer(player.uniqueId)).uncolored())
     }
 
     private fun File.toHtmlString(): String {

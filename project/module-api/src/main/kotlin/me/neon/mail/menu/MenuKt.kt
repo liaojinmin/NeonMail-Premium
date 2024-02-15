@@ -1,8 +1,8 @@
 package me.neon.mail.menu
 
+import me.neon.mail.libs.taboolib.ui.type.Basic
+import me.neon.mail.libs.taboolib.ui.type.Linked
 import org.bukkit.entity.Player
-import taboolib.module.ui.type.Basic
-import taboolib.module.ui.type.Linked
 
 /**
  * NeonMail-Premium
@@ -32,6 +32,9 @@ fun Linked<*>.setupPrev(player: Player, value: MenuIcon, key: Char) {
     }
 }
 
+
+
+
 fun Basic.setupDefaultAction(player: Player, value: MenuIcon, key: Char) {
     if (key != '@') {
         set(key, value.parseItems(player)) {
@@ -39,3 +42,5 @@ fun Basic.setupDefaultAction(player: Player, value: MenuIcon, key: Char) {
         }
     }
 }
+
+

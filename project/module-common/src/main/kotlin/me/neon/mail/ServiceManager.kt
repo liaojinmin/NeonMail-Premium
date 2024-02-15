@@ -4,19 +4,17 @@ import me.neon.mail.api.PlayerData
 import me.neon.mail.api.mail.IDraftBuilder
 import me.neon.mail.api.mail.IMail
 import me.neon.mail.common.PlayerDataImpl
+import me.neon.mail.libs.taboolib.lang.sendLang
+import me.neon.mail.libs.utils.io.asyncRunner
+import me.neon.mail.libs.utils.io.asyncRunnerWithResult
 import me.neon.mail.service.SQLImpl
 import me.neon.mail.service.channel.RedisChannel
 import me.neon.mail.service.channel.ChannelInit
 import me.neon.mail.service.channel.PluginChannel
 import me.neon.mail.service.packet.PlayOutMailReceivePacket
 import me.neon.mail.smtp.SmtpService
-import me.neon.mail.utils.asyncRunner
-import me.neon.mail.utils.asyncRunnerWithResult
 import org.bukkit.Bukkit
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
-import taboolib.common.platform.ProxyPlayer
-import taboolib.platform.util.sendLang
+import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -38,26 +36,24 @@ object ServiceManager {
 
     private val sqlImpl: SQLImpl by lazy { SQLImpl() }
 
-    private val smtpImpl: SmtpService by lazy {
-        SmtpService(NeonMailLoader.smtpTranslate)
+    private val smtp: SmtpService by lazy {
+        SmtpService(NeonMailLoader.plugin, NeonMailLoader.smtpTranslate)
     }
 
     fun getSmtpImpl(): SmtpService? {
         if (NeonMailLoader.useSmtp) {
-            return smtpImpl
+            return smtp
         }
         return null
     }
 
-    @Awake(LifeCycle.ACTIVE)
-    private fun startInit() {
+    internal fun initService() {
         sqlImpl.start()
         channel.onStart()
         PlayOutMailReceivePacket.registerPacket()
     }
 
-    @Awake(LifeCycle.DISABLE)
-    private fun close() {
+    internal fun closeService() {
         sqlImpl.close()
         channel.onClose()
     }
@@ -155,7 +151,7 @@ object ServiceManager {
     }
 
 
-    fun ProxyPlayer.waitDTO() {
+    fun Player.waitDTO() {
         asyncRunner {
             onJob {
                 sqlImpl.selectPlayerData(this@waitDTO) {
@@ -178,7 +174,7 @@ object ServiceManager {
 
     }
 
-    fun ProxyPlayer.getPlayerData(): PlayerData? {
+    fun Player.getPlayerData(): PlayerData? {
         return getPlayerData(this.uniqueId)
     }
 

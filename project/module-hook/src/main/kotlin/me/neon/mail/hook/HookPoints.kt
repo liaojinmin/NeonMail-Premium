@@ -15,12 +15,16 @@ class HookPoints: HookPlugin() {
     private var pointsAPI: Points? = null
 
     override fun getImpl(): HookPoints? {
-        if (checkHook("PlayerPoints") != null) {
-            pointsAPI = PlayerPointsAPI()
-        } else if (checkHook("GeekEconomy") != null) {
-            pointsAPI = GeekEconomyAPI()
+        return try {
+            if (checkHook("PlayerPoints") != null) {
+                pointsAPI = PlayerPointsAPI()
+            } else if (checkHook("GeekEconomy") != null) {
+                pointsAPI = GeekEconomyAPI()
+            }
+            if (pointsAPI != null) this else null
+        } catch (e: Exception) {
+            null
         }
-        return if (pointsAPI != null) this else null
     }
 
     fun look(player: Player): Int {

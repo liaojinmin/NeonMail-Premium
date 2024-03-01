@@ -1,0 +1,67 @@
+
+title: '&0收件箱 %p'
+layout:
+  - '         '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - '         '
+  - '< D B G >'
+
+#
+# 不要修改 "@、D、B、G、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '@':
+    display:
+      mats: BOOK
+      name: '&7主题: &f[title]'
+      model: 0
+      lore:
+        - ''
+        - ' &7发件人: &f[sender]'
+        - ' &7发送时间: &f[senderTime]'
+        - ' &7领取时间: &f[getTime]'
+        - ' &7到期时间: &f[expire]'
+        - ' &7邮件内容:'
+        - ' [text]'
+        - ''
+        - ' &7附件: [state]'
+        - '  &f[item]'
+        - ''
+        - '&8[&B点击&8] &7# 操作、查看'
+
+
+  'B':
+    display:
+      mats: SPECTRAL_ARROW
+      name: '&3# &b绑定邮箱'
+      lore:
+        - ' &7你的绑定: &f%nmp_mail%'
+        - ''
+        - ' &7支持的邮箱:'
+        - ' &fQQ邮箱: &7xxxxx@qq.com'
+        - ' &f网易邮箱: &7xxxxx@163.com'
+        - ' &f谷歌邮箱: &7xxxxx@gmail.com'
+        - ''
+        - '&8[&B&l点击&8] &7# 开始绑定'
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &b跳转至'
+      lore:
+        - '&7上一页'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &b跳转至'
+      lore:
+        - '&7下一页'
+  'D':
+    display:
+      mats: BARRIER
+      name: '&3# &C删除已读'
+  'G':
+    display:
+      mats: CHEST
+      name: '&3# &a全部领取'

@@ -1,26 +1,39 @@
 package me.neon.mail.smtp
 
+import me.neon.mail.api.io.asyncRunner
 import me.neon.mail.api.mail.IMail
-import me.neon.mail.libs.taboolib.chat.HexColor.uncolored
-import me.neon.mail.libs.utils.io.asyncRunner
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import taboolib.common.env.RuntimeDependencies
+import taboolib.common.env.RuntimeDependency
+import taboolib.common.platform.function.warning
+import taboolib.module.chat.uncolored
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.util.*
-import javax.mail.Authenticator
-import javax.mail.Message
-import javax.mail.PasswordAuthentication
-import javax.mail.Session
-import javax.mail.Transport
+import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
 
+@RuntimeDependencies(
+    RuntimeDependency(
+        value = "!javax.mail:mail:1.5.0-b01",
+        test = "javax.mail.Version",
+        relocate = ["!javax.mail", "javax.mail"],
+        transitive = false
+    ),
+    RuntimeDependency(
+        value = "!javax.activation:activation:1.1.1",
+        test = "javax.activation.URLDataSource",
+        relocate = ["!javax.activation", "javax.activation"],
+        transitive = false
+    )
+)
 class SmtpService(
     private val plugin: Plugin,
     private val param: MutableMap<String, String>
@@ -29,15 +42,16 @@ class SmtpService(
     private val password = param["password"] ?: error("找不到smt授权码") // "JRKHOKSYAPSOUHOS"
     private val personal = param["personal"] ?: "NeonMail-Premium"
     private val subjects = param["subjects"] ?: "NeonMail-收件提醒"
+
     private val html by lazy {
         File(plugin.dataFolder, "smtp/web.html").also {
-            if (!it.exists()) plugin.saveResource("smtp/web.html", true)
+            if (!it.exists()) initFile()
         }.toHtmlString()
     }
 
     private val bind by lazy {
         File(plugin.dataFolder, "smtp/bind.html").also {
-            if (!it.exists()) plugin.saveResource("smtp/bind.html", true)
+            if (!it.exists()) initFile()
         }.toHtmlString()
     }
 
@@ -53,6 +67,15 @@ class SmtpService(
         }
     }
 
+    private fun initFile() {
+        File(plugin.dataFolder, "smtp/bind.html").also {
+            if (!it.exists()) plugin.saveResource("smtp/bind.html", true)
+        }
+        File(plugin.dataFolder, "smtp/web.html").also {
+            if (!it.exists()) plugin.saveResource("smtp/web.html", true)
+        }
+    }
+
     fun sendBindEmail(player: Player, code: String, toMail: String) {
         asyncRunner {
             createConnection { transport, session ->
@@ -62,6 +85,21 @@ class SmtpService(
                 message.setRecipient(Message.RecipientType.TO, InternetAddress(toMail))
                 message.setContent(out, "text/html;charset=gb2312")
                 transport.sendMessage(message, message.allRecipients)
+            }
+        }
+    }
+
+    fun sendCustomHtml(html: String, vararg targetMail: String) {
+        asyncRunner {
+            createConnection { transport, session ->
+                val message = createMimeMessage(session)
+                message.setRecipients(Message.RecipientType.TO, targetMail.map { InternetAddress(it) }.toTypedArray())
+                message.setContent(html, "text/html;charset=gb2312")
+                transport.sendMessage(message, message.allRecipients)
+            }
+            onError {
+                warning("发送自定义html时出现异常")
+                it.printStackTrace()
             }
         }
     }
@@ -99,13 +137,13 @@ class SmtpService(
 
     private fun createConnection(function: (Transport, Session) -> Unit) {
         val session = Session.getInstance(properties, authenticator)
-        session.transport.use { function.invoke(this, session) }
+        session.transport.use { function.invoke(this.also { connect() }, session) }
     }
 
     private fun createMailInfo(player: OfflinePlayer, iMail: IMail<*>): String {
         return html.replace("{name}", player.name ?: player.uniqueId.toString())
             .replace("{title}", iMail.title.uncolored())
-            .replace("{text}", iMail.context.uncolored())
+            .replace("{text}", iMail.context.uncolored().replace(";", ""))
             .replace("{app}", iMail.data.getAppendixInfo(Bukkit.getPlayer(player.uniqueId)).uncolored())
     }
 

@@ -3,7 +3,6 @@ package me.neon.mail.api.mail
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import java.util.*
 
 /**
@@ -13,7 +12,7 @@ import java.util.*
  * @author 老廖
  * @since 2024/1/2 12:49
  */
-interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
+interface IMail<T: IMailData>: JsonSerializer<T>, JsonDeserializer<T> {
 
     val uuid: UUID
     val sender: UUID
@@ -29,46 +28,30 @@ interface IMail<T: IMailDataType>: JsonSerializer<T>, JsonDeserializer<T> {
 
     val permission: String
     val mainIcon: Material
-    val mailType: String
+    val translateType: String
     val plugin: String
 
 
     fun sendMail()
 
     /**
-     * 像全部服务器玩家发送邮件，
+     * 发送到所有离线玩家
      */
-    fun sendGlobalMail()
+    fun sendToOfflinePlayers()
 
-    fun checkClaimCondition(player: Player): Boolean
+    /**
+     * 发送到所有在线玩家
+     */
+    fun sendToOnlinePlayers()
 
-    fun giveAppendix(player: Player): Boolean
-
-    fun getMailClassType(): Class<out IMail<T>>
 
     fun getDataClassType(): Class<out T>
 
     /**
-     * 创建附件实体
-     */
-    fun createData(): T
-    /**
      * 克隆方法
      */
-    fun cloneMail(uuid: UUID, sender: UUID, target: UUID, data: IMailDataType): IMail<T>
+    fun cloneMail(uuid: UUID, sender: UUID, target: UUID, data: IMailData): IMail<T>
 
-    /**
-     * 注册邮件
-     */
-    fun register() {
-        IMailRegister.register(this)
-    }
 
-    /**
-     * 取消注册
-     */
-    fun unregister() {
-        IMailRegister.unregister(this)
-    }
 
 }

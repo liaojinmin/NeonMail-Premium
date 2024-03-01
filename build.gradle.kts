@@ -1,16 +1,34 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+import io.izzel.taboolib.gradle.BUKKIT_ALL
+import io.izzel.taboolib.gradle.LANG
+import io.izzel.taboolib.gradle.NMS_UTIL
+import io.izzel.taboolib.gradle.UNIVERSAL
 
 plugins {
+    id("io.izzel.taboolib") version "2.0.9"
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 
 subprojects {
     apply<JavaPlugin>()
+    apply(plugin = "io.izzel.taboolib")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "com.github.johnrengelman.shadow")
+
+    taboolib {
+        env {
+            install(UNIVERSAL, BUKKIT_ALL)
+            install(io.izzel.taboolib.gradle.UI)
+            install(io.izzel.taboolib.gradle.CHAT, LANG)
+            install(io.izzel.taboolib.gradle.NMS, NMS_UTIL)
+            install(io.izzel.taboolib.gradle.EXPANSION_GEEK_TOOL)
+        }
+        version { taboolib = "6.1.0" }
+    }
+
+
     repositories {
         mavenLocal()
         mavenCentral()

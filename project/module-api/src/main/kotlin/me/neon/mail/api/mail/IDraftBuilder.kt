@@ -26,11 +26,11 @@ interface IDraftBuilder {
 
     fun senderMail()
 
-    fun addTarget(uuid: UUID, dataType: IMailDataType)
+    fun addTarget(uuid: UUID, dataType: IMailData)
 
-    fun getTargets(): ConcurrentHashMap<UUID, IMailDataType>
+    fun getTargets(): ConcurrentHashMap<UUID, IMailData>
 
-    fun changeGlobalModel(): IMailDataType
+    fun changeGlobalModel(): IMailData
 
     fun isAllowSender(): Boolean
 

@@ -31,23 +31,22 @@ object IMailRegister {
             override fun shouldSkipClass(clazz: Class<*>): Boolean {
                 return clazz.getAnnotation(Expose::class.java) != null
             }
-        })
-        .setPrettyPrinting()
+        }).setPrettyPrinting()
 
     fun getRegisterMail(type: String): IMail<*>? {
         return mailCache[type]
     }
 
-    fun getRegisterKeys(): List<String> {
-        return mailCache.keys().toList()
+    fun getRegisterMails(): MutableCollection<IMail<*>> {
+        return mailCache.values
     }
 
-    fun deserializeMailData(data: ByteArray, type: Class<out IMailDataType>): IMailDataType {
+    fun deserializeMailData(data: ByteArray, type: Class<out IMailData>): IMailData {
         return gsonBuilder.create()
             .fromJson(String(data, Charsets.UTF_8), type)
     }
 
-    fun serializeMailData(type: IMailDataType): ByteArray {
+    fun serializeMailData(type: IMailData): ByteArray {
         return gsonBuilder
             .create()
             .toJson(type).toByteArray(Charsets.UTF_8)
@@ -64,19 +63,17 @@ object IMailRegister {
         return gsonBuilder.create()
     }
 
-    internal fun register(mail: IMail<*>) {
-        mailCache[mail.mailType] = mail
+    fun register(mail: IMail<*>) {
+        mailCache[mail.data.sourceType] = mail
         Bukkit.getConsoleSender().sendMessage("""§8[§bNeon§9Mail§8-§ePremium§8][§6注册§8]
-            |    §a注册的邮件类 -> §7${mail.getMailClassType()}
             |    §a注册的数据类 -> §7${mail.getDataClassType()}
-            |    §a索引种类名称 -> §7${mail.mailType}
+            |    §a索引种类名称 -> §7${mail.data.sourceType}
         """.trimMargin())
-        gsonBuilder.registerTypeAdapter(mail.getMailClassType(), mail)
         gsonBuilder.registerTypeAdapter(mail.getDataClassType(), mail)
     }
 
-    internal fun unregister(mail: IMail<*>) {
-        mailCache.remove(mail.mailType)
+    fun unregister(mail: IMail<*>) {
+        mailCache.remove(mail.data.sourceType)
     }
 
 

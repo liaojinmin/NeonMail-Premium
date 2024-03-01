@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -7,86 +6,49 @@ plugins {
 val kotlinVersionNum: String
     get() = project.kotlin.coreLibrariesVersion.replace(".", "")
 
-val generatedYamlDir = File("$buildDir/generated")
 
 dependencies {
     implementation(project(":project:module-hook"))
     implementation(project(":project:module-smtp"))
     implementation(project(":project:module-api"))
-    implementation(project(":project:module-common"))
-    implementation(project(":project:module-menu"))
-    implementation(project(":project:module-libs"))
+    implementation(project(":project:runtime-bukkit"))
+}
+
+
+taboolib {
+    description {
+        name(rootProject.name)
+        contributors {
+            name("老廖")
+        }
+    }
+
+    env {
+        enableIsolatedClassloader = false
+
+        version {
+            coroutines = null
+        }
+
+    }
+    // hikari
+    relocate("com.zaxxer.hikari", "${rootProject.group}.libraries.zaxxer.hikari")
+
+    // redis
+    relocate("redis.clients", "${rootProject.group}.libraries.redis.clients")
+
+    // javax
+    relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
+    relocate("com.sun", "${rootProject.group}.libraries.com.sun")
+    relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
 }
 
 tasks {
-
-    withType<ShadowJar> {
-        this.archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
-        archiveClassifier.set("")
-        exclude("META-INF/maven/**")
-        exclude("META-INF/tf/**")
-        exclude("META-INF/LICENSE.txt")
-        exclude("META-INF/NOTICE.txt")
-        exclude("module-info.java")
-
-        exclude("com/google/**")
-        exclude("com/sun/**")
-        exclude("org/apache/**")
-        exclude("org/slf4j/**")
-        exclude("org/json/**")
-
-        // 重定向 Kotlin
-        relocate("kotlin.", "kotlin${kotlinVersionNum}.") {
-            exclude("kotlin.Metadata")
-        }
-        // asm
-        relocate("org.objectweb.asm", "${rootProject.group}.libraries.asm")
-
-        // tabooproject reflex
-        relocate("org.tabooproject.reflex", "${rootProject.group}.libraries.reflex")
-
-        // hikari
-        relocate("com.zaxxer.hikari", "${rootProject.group}.libraries.zaxxer.hikari")
-
-        // redis
-        relocate("redis.clients", "${rootProject.group}.libraries.redis.clients")
-
-        // javax
-        relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
-        relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
-
-        classifier = null
-    }
-
-    shadowJar {
-        println("> Apply plugin.yml")
-        dependsOn("generateYaml")
-        from(generatedYamlDir)
-    }
-
-    build {
-        dependsOn(shadowJar)
-    }
-
-}
-
-tasks.register("generateYaml") {
-    doLast {
-        if (!generatedYamlDir.exists()) {
-            generatedYamlDir.mkdirs()
-        }
-        val yamlContent = """
-            name: ${project.name}
-            version: ${project.version}
-            main:  ${project.group}.NeonMailLoader
-            authors:
-              - '老廖'
-            depend:
-              - PlaceholderAPI
-            api-version: 1.13
-        """.trimIndent()
-        val outputFile = File("$generatedYamlDir/plugin.yml")
-        outputFile.writeText(yamlContent)
+    jar {
+        // 构件名
+        archiveFileName.set("${rootProject.name}-${archiveFileName.get().substringAfter('-')}")
+        // 打包子项目源代码
+        rootProject.subprojects.forEach { from(it.sourceSets["main"].output) }
     }
 }
 

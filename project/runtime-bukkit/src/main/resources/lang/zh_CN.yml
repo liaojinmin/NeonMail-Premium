@@ -1,0 +1,456 @@
+玩家-没有权限-发送邮件:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - type: title
+    title: '&c你没有权限使用这个类型'
+    subtitle: '&3请联系管理员授权.'
+玩家-没有足够背包格子:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - type: title
+    title: '&c你的背包不足以装下所有物品'
+    subtitle: '&3请请理你的背包,留出 &f{0} &3格'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+
+# 草稿邮件操作
+玩家-发送草稿邮件-拒绝:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&c    你的草稿邮件没有设置发送目标...'
+  - '&l'
+玩家-删除草稿邮件-拒绝:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&c    你的草稿邮件部分存在附件，请移除后再试...'
+  - '&l'
+玩家-删除草稿邮件-成功:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&a    已移除草稿邮件...'
+  - '&l'
+玩家-草稿邮件-保存:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&a    已保存 &f{0} &a的编辑进度...'
+  - '&l'
+玩家-草稿邮件-已满:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&e    你的草稿箱已满，请发送或清理后再试...'
+  - '&l'
+玩家-草稿邮件-查询中:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&a    正在获取你的草稿箱，请稍后...'
+  - '&l'
+
+玩家-发送邮件-送达:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&b    你的邮件已发送至 {0}'
+  - '&l'
+玩家-接收邮件-送达:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - type: JSON
+    text:
+      - ' '
+      - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+      - '&l'
+      - '&B    你有新邮件待查看!'
+      - '&7    {0}'
+      - '&7    {1}'
+      - '&l             §8[§a点击查看§8]'
+      - ''
+    args:
+      - hover: '点击查看'
+        command: '/nmp box receiveBOX'
+
+玩家-加入游戏-提醒:
+  - type: sound
+    sound: 'UI_LOOM_TAKE_RESULT'
+    volume: 1
+    pitch: 1
+  - type: JSON
+    text:
+      - ' '
+      - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+      - '&l'
+      - '&B    你有 {0} 封未读邮件！'
+      - '&B'
+      - '&l             §8[§a点击查看§8]'
+      - ''
+    args:
+      - hover: '§8点击查看'
+        command: '/nmp box receiveBOX'
+
+
+
+玩家-邮箱绑定-确认:
+  - type: title
+    title: '&a邮箱验证码已发送'
+    subtitle: '&c请登录你的邮箱查看验证码'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+玩家-邮箱绑定-输入:
+  - type: title
+    title: '&c请输入你的邮箱账号'
+    subtitle: '&7你有 &f20 &7秒的时间'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入要绑定的邮箱账号并以 &f回车键 &7结束'
+  - '§A   ♻&7取消输入 &fCancel &7结束'
+  - '&l'
+玩家-邮箱绑定-成功:
+  - type: title
+    title: '&a邮箱绑定成功'
+    subtitle: '&a你现在可以正常使用了'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+玩家-邮箱绑定-错误:
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你输入的错误的邮箱格式'
+  - '§A   请重新进行绑定流程...'
+  - '&l'
+
+玩家-领取附件-成功:
+  - type: sound
+    sound: 'ENTITY_LLAMA_CHEST'
+    volume: 1
+    pitch: 1
+  - type: sound
+    sound: 'ENTITY_EXPERIENCE_ORB_PICKUP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&b    成功领取附件，获得以下物品:'
+  - '&f    {0}'
+玩家-领取全部附件-失败:
+  - type: sound
+    sound: 'ENTITY_LLAMA_CHEST'
+    volume: 1
+    pitch: 1
+  - type: sound
+    sound: 'ENTITY_EXPERIENCE_ORB_PICKUP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&c    没有可领取的附件'
+  - '&f    '
+
+邮件-删除操作-确认:
+  - type: title
+    title: '&c请确认操作'
+    subtitle: '&7你有 &f20 &7秒的时间'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入 &f确认 &7或 &fok &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消'
+  - '&l'
+邮件-删除操作-成功:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   已删除 {0} 个邮件...'
+  - '&l'
+邮件-删除操作-失败:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你没有可删除的邮件...'
+  - '&l'
+邮件-删除操作-失败-附件存在:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&c    你不能删除该邮件，请先领取附件内容！'
+  - '&f'
+邮件-领取附件-失败:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&b    这个附件你已经领取过了！'
+  - '&f'
+
+玩家-邮件到期-删除:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 2
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&e    你有 {0} 封邮件已到期删除...'
+  - '&f'
+
+玩家-发送物品邮件-物品筛选:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 2
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&c   你有 {0} 个违规物品禁止邮寄...'
+  - '&a   物品已返回你的背包'
+  - '&f'
+
+
+# 编辑邮件
+邮件-编辑操作-标题:
+  - type: title
+    title: '&c请输入标题'
+    subtitle: '&7完成后将返回'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入邮件标题 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消'
+  - '&l'
+邮件-编辑操作-文本:
+  - type: title
+    title: '&c请输入文本'
+    subtitle: '&7完成后将返回'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入邮件内容 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消 ,&7使用 &f; &7换行文本'
+  - '&l'
+邮件-编辑操作-指令:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入附件指令 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消 ,&7使用 &f; &7分割换行'
+  - '&l'
+邮件-编辑操作-金币:
+  - type: title
+    title: '&c请输入数量'
+    subtitle: '&7你有 &f20 &7秒的时间'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入要邮寄的金币 &f整数 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消'
+  - '&l'
+邮件-编辑操作-金币不足:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你没有足够的金币添加附件...'
+  - '&l'
+邮件-编辑操作-点券:
+  - type: title
+    title: '&c请输入数量'
+    subtitle: '&7你有 &f20 &7秒的时间'
+    fadein: 20
+    fadeout: 20
+    stay: 40
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入要邮寄的金币 &f整数 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消'
+  - '&l'
+邮件-编辑操作-点券不足:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你没有足够的点券添加附件...'
+  - '&l'
+邮件-编辑操作-输入类型错误:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   输入错误，需要输入数字(整数)'
+  - '&l'
+邮件-编辑操作-输入长度超出:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你输入了过长的文本, 限制 &f{0} &c长度, 当前长度 &f{1} &c...'
+  - '&l'
+邮件-编辑操作-输入存在屏蔽词:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_DIDGERIDOO'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§c   你输入了过长的文本, 限制 &f255 &c长度, 当前长度 &f{0} &c...'
+  - '&l'
+
+管理员-草稿邮件-保存模板确认:
+  - type: title
+    title: '&a请输入模板名称'
+    subtitle: '&7你有 &f20 &7秒的时间，操作不可撤销。'
+    fadein: 20
+    fadeout: 20
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '§A   ♻&7请输入要保存的名称 &7并以 &f回车键 &7结束'
+  - '§A   ♻&7输入 &fCancel &7取消'
+  - '&l'
+
+
+CMD-HELP-ADMIN:
+  - '  &c管理员: '
+  - '    &7-&f reload'
+  - '      &8重写载入配置文件'
+CMD-HELP-PLAYER:
+  - '  &a玩家: '
+  - '    &7-&f box &f<&7邮箱种类&f>'
+  - '      &8打开对应种类的UI面板'
+PLAYER-ADMIN-MENU:
+  - type: sound
+    sound: 'BLOCK_NOTE_BLOCK_HARP'
+    volume: 1
+    pitch: 1
+  - '&1'
+  - '&7  &bNeon&9Mail&8-&ePremium &8>&7>&f>'
+  - '&l'
+  - '&e    请注意你使用了超级权限打开了编辑菜单，将不再扣除附件需求...'
+  - '&l'

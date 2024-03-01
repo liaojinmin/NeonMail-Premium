@@ -24,6 +24,8 @@ interface PlayerData {
 
     val receiveBox: CopyOnWriteArrayList<IMail<*>>
 
+    var isLoader: Boolean
+
     fun getAllDraft(): MutableList<IDraftBuilder>
     fun applyDraft(data: MutableList<IDraftBuilder>)
     fun addDraft(draftBuilder: IDraftBuilder)

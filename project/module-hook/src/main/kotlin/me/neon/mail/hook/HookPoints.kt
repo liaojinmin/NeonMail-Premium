@@ -1,6 +1,8 @@
 package me.neon.mail.hook
 
 
+import org.black_ixx.playerpoints.PlayerPoints
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 /**
@@ -79,21 +81,26 @@ class HookPoints: HookPlugin() {
 
     class PlayerPointsAPI: Points {
 
-        private val playerPointsAPI = org.black_ixx.playerpoints.PlayerPoints.getInstance().api
+        private val playerPointsAPI by lazy {
+            val plugin = Bukkit.getServer().pluginManager.getPlugin("PlayerPoints")
+            if (plugin != null) {
+                (plugin as PlayerPoints).api
+            } else null
+        }
         override fun look(player: Player): Int {
-            return playerPointsAPI.look(player.uniqueId)
+            return playerPointsAPI?.look(player.uniqueId) ?: -1
         }
 
         override fun add(player: Player, amount: Int): Boolean {
-            return playerPointsAPI.give(player.uniqueId, amount)
+            return playerPointsAPI?.give(player.uniqueId, amount) == true
         }
 
         override fun take(player: Player, amount: Int): Boolean {
-            return playerPointsAPI.take(player.uniqueId, amount)
+            return playerPointsAPI?.take(player.uniqueId, amount) == true
         }
 
         override  fun set(player: Player, amount: Int): Boolean {
-            return playerPointsAPI.set(player.uniqueId, amount)
+            return playerPointsAPI?.set(player.uniqueId, amount) == true
         }
     }
 }

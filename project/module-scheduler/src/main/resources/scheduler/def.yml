@@ -1,0 +1,21 @@
+scheduler:
+  uniqueId: "默认调度-Cron"
+
+  # 是否启用
+  enable: false
+
+  # Cron 优先
+  # 每分钟
+  cron: "0 * * ? * *"
+
+  # 发送给所以在线玩家
+  target: online
+
+  # 需要发送的模板
+  template: 每分钟奖励
+
+  # 自定义指令
+  command: []
+
+
+

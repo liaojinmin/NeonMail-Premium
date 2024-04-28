@@ -1,0 +1,563 @@
+草稿箱-物品子UI:
+  options:
+    guide: false
+    startX: 0
+    startY: 0
+    startZ: 15
+    blur: true
+    escCloseOnly: true
+  总画布:
+    type: canvas
+    enable: true
+    locationX: "(w-194)/2"
+    locationY: "(h-224)/2"
+    locationZ: "0"
+    width: "194"
+    height: "178"
+    background:
+      type: texture
+      path: 'local<->textures/mail/背景3.png'
+    relativeParts:
+      UI-标题:
+        type: label
+        enable: true
+        shadow: false
+        lineSpace: '0'
+        splitWidth: w*0.4+40
+        omitWidth: '100'
+        scale: '1.2'
+        texts:
+         - '&6放入物品'
+        locationX: 0.088*h
+        locationY: 0.0046*w
+        locationZ: '1'
+      退出界面:
+        type: button
+        hoverPath: local<->textures/mail/air.png
+        defaultPath: local<->textures/mail/a.png
+        locationX: 0.666*h
+        locationY: 0.03*w
+        locationZ: '1'
+        width: h*0.05
+        height: h*0.05
+        clickDos:
+          - "openChild<->null"
+      物品画布:
+        type: canvas
+        enable: true
+        locationX: 0.068*h
+        locationY: 0.076*w
+        locationZ: '5'
+        width: h*0.29
+        height: h*0.098
+        relativeParts:
+          槽位-1:
+            type: slot
+            size: "16"
+            locationX: 0
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-2:
+            type: slot
+            size: "16"
+            locationX: 17
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-3:
+            type: slot
+            size: "16"
+            locationX: 17*2
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-4:
+            type: slot
+            size: "16"
+            locationX: 17*3
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-5:
+            type: slot
+            size: "16"
+            locationX: 17*4
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-6:
+            type: slot
+            size: "16"
+            locationX: 17*5
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-7:
+            type: slot
+            size: "16"
+            locationX: 17*6
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-8:
+            type: slot
+            size: "16"
+            locationX: 17*7
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-9:
+            type: slot
+            size: "16"
+            locationX: 17*8
+            locationY: 0
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-10:
+            type: slot
+            size: "16"
+            locationX: 0
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-11:
+            type: slot
+            size: "16"
+            locationX: 17
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-12:
+            type: slot
+            size: "16"
+            locationX: 17*2
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-13:
+            type: slot
+            size: "16"
+            locationX: 17*3
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-14:
+            type: slot
+            size: "16"
+            locationX: 17*4
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-15:
+            type: slot
+            size: "16"
+            locationX: 17*5
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-16:
+            type: slot
+            size: "16"
+            locationX: 17*6
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-17:
+            type: slot
+            size: "16"
+            locationX: 17*7
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+          槽位-18:
+            type: slot
+            size: "16"
+            locationX: 17*8
+            locationY: 19
+            invalid: false
+            swallow: false
+            interact: true
+      Slot_9:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_9"
+        locationX: '17'
+        locationY: '88'
+      Slot_10:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_10"
+        locationX: 17*2
+        locationY: '88'
+      Slot_11:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_11"
+        locationX: 17*3
+        locationY: '88'
+      Slot_12:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_12"
+        locationX: 17*4
+        locationY: '88'
+      Slot_13:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_13"
+        locationX: 17*5
+        locationY: '88'
+      Slot_14:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_14"
+        locationX: 17*6
+        locationY: '88'
+      Slot_15:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_15"
+        locationX: 17*7
+        locationY: '88'
+      Slot_16:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_16"
+        locationX: 17*8
+        locationY: '88'
+      Slot_17:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_17"
+        locationX: 17*9
+        locationY: '88'
+      #背包第二行第一格
+      Slot_18:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_18"
+        locationX: '17'
+        locationY: '88+17'
+      Slot_19:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_19"
+        locationX: '17*2'
+        locationY: '88+17'
+      Slot_20:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_20"
+        locationX: '17*3'
+        locationY: '88+17'
+      Slot_21:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_21"
+        locationX: '17*4'
+        locationY: '88+17'
+      Slot_22:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_22"
+        locationX: 17*5
+        locationY: '88+17'
+      Slot_23:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_23"
+        locationX: 17*6
+        locationY: '88+17'
+      Slot_24:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_24"
+        locationX: 17*7
+        locationY: '88+17'
+      Slot_25:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_25"
+        locationX: 17*8
+        locationY: '88+17'
+      Slot_26:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_26"
+        locationX: 17*9
+        locationY: '88+17'
+      #背包第三行第一格
+      Slot_27:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_27"
+        locationX: '17'
+        locationY: '88+34'
+      Slot_28:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_28"
+        locationX: '17*2'
+        locationY: '88+34'
+      Slot_29:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_29"
+        locationX: '17*3'
+        locationY: '88+34'
+      Slot_30:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_30"
+        locationX: 17*4
+        locationY: '88+34'
+      Slot_31:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_31"
+        locationX: 17*5
+        locationY: '88+34'
+      Slot_32:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_32"
+        locationX: 17*6
+        locationY: '88+34'
+      Slot_33:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_33"
+        locationX: 17*7
+        locationY: '88+34'
+      Slot_34:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_34"
+        locationX: 17*8
+        locationY: '88+34'
+      Slot_35:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_35"
+        locationX: 17*9
+        locationY: '88+34'
+      #背包最后一行第一格，最后一行也是玩家的快捷物品栏
+      #最后一行的图片相比于前面的多了一点空隙，所以locationY +4
+      Slot_36:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_0"
+        locationX: '17'
+        locationY: '88+56'
+      Slot_37:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_1"
+        locationX: '17*2'
+        locationY: '88+56'
+      Slot_38:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_2"
+        locationX: '17*3'
+        locationY: '88+56'
+      Slot_39:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_3"
+        locationX: '17*4'
+        locationY: '88+56'
+      Slot_40:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_4"
+        locationX: '17*5'
+        locationY: '88+56'
+      Slot_41:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_5"
+        locationX: '17*6'
+        locationY: '88+56'
+      Slot_42:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_6"
+        locationX: '17*7'
+        locationY: '88+56'
+      Slot_43:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_7"
+        locationX: '17*8'
+        locationY: '88+56'
+      Slot_44:
+        type: slot
+        size: "16"
+        invalid: false
+        interact: true
+        fillpath: "local<->textures/mail/槽位.png"
+        emptypath: "local<->textures/mail/槽位.png"
+        identity: "germplugin_backpack_8"
+        locationX: '17*9'
+        locationY: '88+56'
+                  
+              

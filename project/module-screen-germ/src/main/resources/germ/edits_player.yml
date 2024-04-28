@@ -1,0 +1,127 @@
+草稿箱-选择玩家UI:
+  options:
+    guide: false
+    startX: 0
+    startY: 0
+    startZ: '0'
+    blur: true
+    escCloseOnly: true
+  总画布:
+    type: canvas
+    enable: true
+    locationX: 0.430*w
+    locationY: 0.080*h
+    locationZ: 10
+    width: h*0.445
+    height: h*0.725
+    background:
+      type: texture
+      path: 'local<->textures/mail/背景2.png'
+    relativeParts:
+      UI-标题:
+        type: label
+        enable: true
+        shadow: false
+        lineSpace: '0'
+        splitWidth: w*0.4+40
+        omitWidth: '100'
+        scale: '1.2'
+        texts:
+         - '&6选择玩家'
+        locationX: 0.088*h
+        locationY: 0.0046*w
+        locationZ: '1'
+      搜索玩家:
+        type: input
+        background: true
+        preview: 搜索玩家...
+        limit: 12
+        regular: '[^(一-龥)]'
+        input: ''
+        locationX: 0.08*h
+        locationY: 0.14*h
+        locationZ: '1'
+        width: h*0.2
+        height: h*0.034
+      搜索确认:
+        type: button
+        background: true
+        defaultPath: 'local<->textures/mail/button_search.png'
+        hoverPath: 'local<->textures/mail/button_search2.png'
+        width: h*0.034
+        height: h*0.034
+        locationX: 0.29*h
+        locationY: 0.14*h
+      scroll:
+        type: scroll
+        enable: true
+        invalid: false
+        width: h*0.28
+        height: h*0.47
+        locationX: 0.068*h
+        locationY: 0.18*h
+        locationZ: '0'
+        relative: true
+        scrollDraggable: true
+        sliderV:
+          type: 3
+          defaultPath: local<->textures/mail/滚动框按钮.png
+          hoverPath: local<->textures/mail/滚动框按钮.png
+          width: '8'
+          height: '20'
+        locationVX: 0.296*h
+        locationVY: '1'
+        heightV: 'h*0.088'
+        invalidV: false
+        scrollableV: auto
+        scrolledV: '0'
+        invalidH: true
+        layout:
+          type: FLOW
+          gapX: '0'
+          gapY: '1'
+        scrollableParts:
+          player_list_canvas:
+            type: canvas
+            enable: true
+            width: h*0.28
+            height: h*0.065
+            relativeParts:
+              玩家头颅:
+                type: item
+                enable: true
+                size: '12'
+                locationX: 0.02*w
+                locationY: 0.036*h
+                itemStack:
+                  ==: org.bukkit.inventory.ItemStack
+                  type: DIAMOND_SWORD
+              玩家名字:
+                type: label
+                enable: true
+                shadow: false
+                lineSpace: '0'
+                splitWidth: w*0.4+40
+                omitWidth: '100'
+                texts:
+                  - '§f&l%player_name%'
+                locationX: 0.1*h
+                locationY: 0.02*h
+              选择玩家:
+                type: button
+                enable: true
+                defaultPath: local<->textures/mail/按钮.png
+                hoverPath: local<->textures/mail/按钮2.png
+                locationX: 0.18*h
+                locationY: 0.018*h
+                locationZ: '0'
+                width: 20
+                height: 10
+                texts:
+                  - '&e选择'
+              玩家信息条:
+                type: color
+                enable: true
+                color: 268435456
+                width: h*0.28
+                height: h*0.065

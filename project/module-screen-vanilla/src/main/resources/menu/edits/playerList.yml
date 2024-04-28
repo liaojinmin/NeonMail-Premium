@@ -1,0 +1,48 @@
+title: '&0选择玩家'
+layout:
+  - '#########'
+  - '#@@@@@@@#'
+  - '#@@@@@@@#'
+  - '#<#####>#'
+  - 'B#######A'
+
+#
+# 不要修改 "<、>、B、@" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '@':
+    # 这个图标的变量以列表玩家为目标进行解析
+    # 而不是打开界面的玩家
+    display:
+      mats: BOOK
+      name: '&7玩家名称: %player_name%'
+      lore:
+        - ''
+        - '&8[&a点击&8] &7# 选择'
+  B:
+    display:
+      mats: APPLE
+      name: '&3# &b返回'
+  A:
+    display:
+      mats: MINECART
+      name: '&3# &e选择全部玩家'
+      lore:
+        - ''
+        - '&7点击此按钮，将邮件抄送目标设置为全局'
+        - '&e在开启此选项后，请注意不要再次选择单个玩家发送'
+        - '&7否则会导致该玩家收到两次邮件'
+        - ''
+        - '&8&n请注意，该按钮仅超级权限打开可见'
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &7上一页 &f{nowPage}&8/&f{maxPage}'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &7下一页 &f{nowPage}&8/&f{maxPage}'
+  '#':
+    display:
+      mats: BLACK_STAINED_GLASS_PANE
+      name: '&b&l 挡板'

@@ -6,7 +6,7 @@ import io.izzel.taboolib.gradle.NMS_UTIL
 import io.izzel.taboolib.gradle.UNIVERSAL
 
 plugins {
-    id("io.izzel.taboolib") version "2.0.9"
+    id("io.izzel.taboolib") version "2.0.12"
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
@@ -25,7 +25,7 @@ subprojects {
             install(io.izzel.taboolib.gradle.NMS, NMS_UTIL)
             install(io.izzel.taboolib.gradle.EXPANSION_GEEK_TOOL)
         }
-        version { taboolib = "6.1.0" }
+        version { taboolib = "6.1.1" }
     }
 
 
@@ -40,10 +40,6 @@ subprojects {
         maven("https://repo.rosewooddev.io/repository/public/")
         maven("https://repo.opencollab.dev/maven-snapshots/")
         maven("https://jitpack.io")
-        maven {
-            url = uri("http://ptms.ink:8081/repository/releases/")
-            isAllowInsecureProtocol = true
-        }
     }
 
 
@@ -53,8 +49,8 @@ subprojects {
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
 
-        implementation("redis.clients:jedis:4.2.2")
-        implementation("com.zaxxer:HikariCP:4.0.3")
+        compileOnly("redis.clients:jedis:4.2.2")
+        compileOnly("com.zaxxer:HikariCP:4.0.3")
 
         // server
         compileOnly("ink.ptms.core:v11604:11604")

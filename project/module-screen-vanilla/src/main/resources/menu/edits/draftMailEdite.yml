@@ -1,0 +1,86 @@
+title: '&0发送邮件'
+layout:
+  - '########A'
+  - '#@@@@@@@#'
+  - '#@@@@@@@#'
+  - '#<#1#2#>#'
+  - 'B  D S  G'
+
+#
+# 不要修改 "B、S、G、1、2、@、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  1:
+    display:
+      mats: BOOK
+      name: '&7主题:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[title]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  2:
+    display:
+      mats: BOOK
+      name: '&7内容:'
+      model: 0
+      lore:
+        - ''
+        - ' &f[text]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+  '@':
+    display:
+      mats: BOOK
+      name: '&7收件人信息:'
+      lore:
+        - ''
+        - ' &7目标玩家: &f[player]'
+        - ' &7附件:'
+        - ' &f[info]'
+        - ''
+        - '&8[&a点击&8] &7# 修改'
+      subIcon:
+        mats: BARRIER
+        name: '&e添加收件人'
+        lore:
+          - ''
+          - '&8[&a点击&8] &7# 添加一个'
+  D:
+    display:
+      mats: APPLE
+      name: '&3# &c删除'
+  A:
+    # 此按钮仅在管理员模式下可见，可将编辑好的邮件内容保存为模板
+    #
+    # 你需要添加最少一个收件人，以此设置邮件的附件内容
+    #
+    display:
+      mats: book
+      name: '&3# &2保存为邮件模板'
+
+  S:
+    display:
+      mats: ender_chest
+      name: '&3# &b保存为草稿'
+  G:
+    display:
+      mats: DIAMOND
+      name: '&3# &a发送'
+  B:
+    display:
+      mats: APPLE
+      name: '&3# &b返回'
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &7上一页 &f{nowPage}&8/&f{maxPage}'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &7下一页 &f{nowPage}&8/&f{maxPage}'
+  '#':
+    display:
+      mats: BLACK_STAINED_GLASS_PANE
+      name: '&b&l 挡板'

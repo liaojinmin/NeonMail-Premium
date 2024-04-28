@@ -1,7 +1,9 @@
 package me.neon.mail.hook
 
-import org.bukkit.plugin.Plugin
-import taboolib.platform.util.bukkitPlugin
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
+import taboolib.common.platform.PlatformFactory
+import taboolib.common.platform.function.warning
 
 
 /**
@@ -11,44 +13,29 @@ import taboolib.platform.util.bukkitPlugin
  * @author 老廖
  * @since 2024/1/17 20:01
  */
-class ProviderRegister<T> {
+object ProviderRegister {
 
-    private val cache = LinkedHashMap<Class<out T>, RegistryObject<T>>()
-    fun <U: T> register(clazz: Class<out U>, plugin: Plugin, supplier: () -> U?): RegistryObject<U>? {
-        val data: U = supplier.invoke() ?: return null
-        @Suppress("UNCHECKED_CAST")
-        return cache.computeIfAbsent(clazz) {
-            RegistryObject(plugin, data)
-        } as RegistryObject<U>
+    val points: HookPoints? by lazy {
+        PlatformFactory.getAPIOrNull()
     }
 
-    fun <U: T> get(clazz: Class<out U>): RegistryObject<U>? {
-        @Suppress("UNCHECKED_CAST")
-        return cache[clazz] as? RegistryObject<U>
+    val money: HookMoney? by lazy {
+        PlatformFactory.getAPIOrNull()
     }
 
-    fun <U: T> remove(clazz: Class<out U>): RegistryObject<U>? {
-        @Suppress("UNCHECKED_CAST")
-        return cache.remove(clazz) as? RegistryObject<U>
+    @Awake(LifeCycle.ACTIVE)
+    fun init() {
+        runCatching {
+            PlatformFactory.registerAPI(HookPoints().getImpl()!!)
+        }.onFailure {
+            warning("无法获取点券实现插件...")
+        }
+        runCatching {
+            PlatformFactory.registerAPI(HookMoney().getImpl()!!)
+        }.onFailure {
+            warning("无法获取经济实现插件...")
+        }
     }
-
-    /**
-     * 纯被动注册，首次调用时初始化
-     */
-    companion object {
-
-        private val providerRegister: ProviderRegister<HookPlugin> = ProviderRegister()
-
-        val points: RegistryObject<HookPoints>? = try {
-            providerRegister.register(HookPoints::class.java, bukkitPlugin) { HookPoints().getImpl() }
-        } catch (_: Exception) { null }
-
-        val money: RegistryObject<HookMoney>? =  try {
-            providerRegister.register(HookMoney::class.java, bukkitPlugin) { HookMoney().getImpl() }
-        } catch (_: Exception) { null }
-
-
-    }
-
-
 }
+
+

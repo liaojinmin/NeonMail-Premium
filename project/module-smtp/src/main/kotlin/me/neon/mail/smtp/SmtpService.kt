@@ -1,7 +1,7 @@
 package me.neon.mail.smtp
 
-import me.neon.mail.api.io.asyncRunner
-import me.neon.mail.api.mail.IMail
+import me.neon.mail.utils.asyncRunner
+import me.neon.mail.mail.IMail
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
@@ -20,17 +20,20 @@ import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
 
+// 不要重新定向，会出问题
 @RuntimeDependencies(
     RuntimeDependency(
-        value = "!javax.mail:mail:1.5.0-b01",
+        value = "javax.mail:mail:1.5.0-b01",
         test = "javax.mail.Version",
-        relocate = ["!javax.mail", "javax.mail"],
         transitive = false
     ),
     RuntimeDependency(
-        value = "!javax.activation:activation:1.1.1",
+        value = "javax.mail:javax.mail-api:1.6.2",
+        transitive = false
+    ),
+    RuntimeDependency(
+        value = "javax.activation:activation:1.1.1",
         test = "javax.activation.URLDataSource",
-        relocate = ["!javax.activation", "javax.activation"],
         transitive = false
     )
 )
@@ -42,6 +45,7 @@ class SmtpService(
     private val password = param["password"] ?: error("找不到smt授权码") // "JRKHOKSYAPSOUHOS"
     private val personal = param["personal"] ?: "NeonMail-Premium"
     private val subjects = param["subjects"] ?: "NeonMail-收件提醒"
+
 
     private val html by lazy {
         File(plugin.dataFolder, "smtp/web.html").also {
@@ -77,6 +81,7 @@ class SmtpService(
     }
 
     fun sendBindEmail(player: Player, code: String, toMail: String) {
+        //Class.forName("com.sun.mail.smtp.SMTPTransport")
         asyncRunner {
             createConnection { transport, session ->
                 val out = bind.replace("{player}", player.name)
@@ -144,7 +149,7 @@ class SmtpService(
         return html.replace("{name}", player.name ?: player.uniqueId.toString())
             .replace("{title}", iMail.title.uncolored())
             .replace("{text}", iMail.context.uncolored().replace(";", ""))
-            .replace("{app}", iMail.data.getAppendixInfo(Bukkit.getPlayer(player.uniqueId)).uncolored())
+            .replace("{app}", iMail.data.getAllAppendixInfo(Bukkit.getPlayer(player.uniqueId)).uncolored())
     }
 
     private fun File.toHtmlString(): String {

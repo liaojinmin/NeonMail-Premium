@@ -1,0 +1,389 @@
+发件箱-UI:
+  options:
+    guide: false
+    startX: 0
+    startY: 0
+    startZ: 0
+    blur: true
+    escCancel: true
+  总画布:
+    type: canvas
+    enable: true
+    locationX: 0.120*w
+    locationY: 0.140*h
+    width: h*1.448
+    height: h*0.725
+    background:
+      type: texture
+      path: 'local<->textures/mail/背景.png'
+    relativeParts:
+      UI-标题:
+        type: label
+        enable: true
+        shadow: false
+        lineSpace: '0'
+        splitWidth: w*0.4+40
+        omitWidth: '100'
+        scale: '1.2'
+        texts:
+          - '&6发件箱'
+        locationX: 0.288*h
+        locationY: 0.0046*w
+        locationZ: '1'
+      退出界面:
+        type: button
+        hoverPath: local<->textures/mail/air.png
+        defaultPath: local<->textures/mail/air.png
+        locationX: 1.158*h
+        locationY: 0.0538*w
+        locationZ: '1'
+        width: h*0.05
+        height: h*0.05
+        clickDos:
+          - "open<->null"
+      功能按钮画布:
+        type: canvas
+        enable: true
+        width: h*0.466
+        height: h*0.045
+        locationX: 0.688*h
+        locationY: 0.003*w
+        locationZ: '1'
+        relativeParts:
+          草稿箱按钮:
+            type: checkbox
+            defaultPath: 'local<->textures/mail/功能按钮.png'
+            hoverPath: 'local<->textures/mail/功能按钮.png'
+            checkedPath: "local<->textures/mail/功能按钮2.png"
+            enable: true
+            width: h*0.16
+            height: h*0.048
+            locationX: -0.012*h
+            texts:
+              - "&e草稿箱"
+          收件箱按钮:
+            enable: true
+            type: checkbox
+            defaultPath: 'local<->textures/mail/功能按钮.png'
+            hoverPath: 'local<->textures/mail/功能按钮.png'
+            checkedPath: "local<->textures/mail/功能按钮2.png"
+            width: h*0.16
+            height: h*0.048
+            locationX: 0.168*h
+            texts:
+              - "&e收件箱"
+          发件箱按钮:
+            type: checkbox
+            enable: true
+            defaultPath: 'local<->textures/mail/功能按钮.png'
+            hoverPath: 'local<->textures/mail/功能按钮.png'
+            checkedPath: "local<->textures/mail/功能按钮2.png"
+            width: h*0.16
+            height: h*0.048
+            locationX: 0.348*h
+            texts:
+              - "&e发件箱"
+      # 在玩家选择对应邮件后，此画布打开，并展示这个画布的信息
+      # 未选择时此画布处于关闭状态
+      右信息画布:
+        type: canvas
+        enable: true
+        width: h*0.498
+        height: h*0.472
+        locationX: 0.65*h
+        locationY: 0.136*h
+        locationZ: '1'
+        relativeParts:
+          删除邮件:
+            type: button
+            enable: true
+            defaultPath: local<->textures/mail/按钮4.png
+            hoverPath: local<->textures/mail/按钮4.png
+            locationX: 0.248*h
+            locationY: 0.478*h
+            locationZ: '0'
+            width: h*0.1
+            height: h*0.04
+            textScale: "0.7"
+            texts:
+              - "&0删除邮件"
+          物品画布:
+            type: canvas
+            enable: true
+            locationX: 0.168*h
+            locationY: 0.374*h
+            locationZ: '5'
+            width: h*0.29
+            height: h*0.098
+            relativeParts:
+              物品列表:
+                type: scroll
+                width: h*0.29
+                height: h*0.098
+                enable: true
+                relative: true
+                scrollDraggable: true
+                sliderV:
+                  type: button
+                  defaultPath: local<->textures/mail/滚动框按钮2.png
+                  hoverPath: local<->textures/mail/滚动框按钮2.png
+                  width: '6'
+                  height: '20'
+                heightV: 'h*0.008'
+                locationVX: 0.306*h
+                locationVY: '1'
+                invalidH: true
+                scrollableV: auto
+                scrolledV: '0'
+                invalidV: false
+                layout:
+                  type: FLOW
+                  gapX: '3'
+                scrollableParts:
+                  物品槽子画布:
+                    type: canvas
+                    enable: true
+                    width: h*0.088
+                    height: h*0.088
+                    relativeParts:
+                      图标纹理:
+                        type: texture
+                        enable: true
+                        path: local<->textures/mail/槽位.png
+                        width: h*0.088
+                        height: h*0.088
+                      物品附件:
+                        type: item
+                        size: '20'
+                        locationX: 0.044*h
+                        locationY: 0.044*h
+ 
+
+
+            
+          信息画布:
+            type: canvas
+            enable: true
+            locationX: '1'
+            locationY: '6'
+            locationZ: '5'
+            width: h*0.446
+            height: h*0.34
+            relativeParts:
+              标题:
+                type: label
+                enable: true
+                shadow: false
+                lineSpace: '0'
+                splitWidth: w*0.4+40
+                omitWidth: '100'
+                scale: '1.5'
+                texts: []
+                locationX: 0.01*h
+              文本列表滚动:
+                type: scroll
+                enable: true
+                invalid: false
+                width: h*0.424
+                height: h*0.268
+                locationX: 0.01*h
+                locationY: 0.048*h
+                relative: true
+                scrollDraggable: true
+                sliderV:
+                  type: 3
+                  defaultPath: local<->textures/mail/滚动框按钮2.png
+                  hoverPath: local<->textures/mail/滚动框按钮2.png
+                  width: '8'
+                  height: '20'
+                heightV: 'h*0.2'
+                locationVX: 0.456*h
+                locationVY: '1'
+                invalidV: false
+                scrollableV: auto
+                scrolledV: '0'
+                invalidH: true
+                layout:
+                  type: FLOW
+                  gapX: '0'
+                  gapY: '1'
+                scrollableParts:
+                  文本:
+                    type: label
+                    enable: true
+                    shadow: false
+                    scale: '0.8'
+                    texts: []
+
+          货币画布:
+            type: canvas
+            enable: true
+            locationX: 0.016*h
+            locationY: 0.368*h
+            locationZ: '5'
+            width: h*0.126
+            height: h*0.085
+            relativeParts:
+              金币图标:
+                type: texture
+                enable: true
+                path: local<->textures/mail/金币.png
+                locationX: -0.005*w
+                locationY: 0.02*h
+                width: w*0.015
+                height: h*0.03
+              金币纹理:
+                type: texture
+                enable: true
+                path: local<->textures/mail/经济框.png
+                locationX: 0.014*w
+                locationY: 0.028*h
+                width: w*0.05
+                height: h*0.02
+              # 此索引名称不要修改，修改则无法获取附件信息解析器
+              金币文本解析:
+                type: label
+                enable: true
+                shadow: false
+                lineSpace: '0'
+                scale: '0.8'
+                # 此处留空，系统会处理
+                texts: []
+                locationX: 0.015*w
+                locationY: 0.028*h
+              点券图标:
+                type: texture
+                enable: true
+                path: local<->textures/mail/点券.png
+                locationX: -0.005*w
+                locationY: 0.06*h
+                width: w*0.015
+                height: h*0.03
+              点券纹理:
+                type: texture
+                enable: true
+                path: local<->textures/mail/经济框.png
+                locationX: 0.014*w
+                locationY: 0.068*h
+                width: w*0.05
+                height: h*0.02
+              # 此索引名称不要修改，修改则无法获取附件信息解析器
+              点券文本解析:
+                type: label
+                enable: true
+                shadow: false
+                lineSpace: '0'
+                scale: '0.8'
+                # 此处留空，系统会处理
+                texts: []
+                locationX: 0.015*w
+                locationY: 0.068*h
+                
+
+      邮件列表画布:
+        type: canvas
+        enable: true
+        width: h*0.364
+        height: h*0.53
+        locationX: 0.244*h
+        locationY: 0.128*h
+        locationZ: '1'
+        relativeParts:
+          删除全部:
+            type: checkbox
+            defaultPath: 'local<->textures/mail/按钮.png'
+            hoverPath: 'local<->textures/mail/按钮.png'
+            checkedPath: "local<->textures/mail/按钮2.png"
+            width: h*0.14
+            height: h*0.034
+            locationX: 0.012*h
+            locationY: 0.006*h
+            texts:
+              - "&c&l删除全部"
+            textScale: "0.7"
+          邮件列表滚动:
+            type: scroll
+            enable: true
+            invalid: false
+            width: h*0.364
+            height: h*0.488
+            locationY: 0.038*h
+            locationZ: '1'
+            relative: true
+            scrollDraggable: true
+            sliderV:
+              type: 3
+              defaultPath: local<->textures/mail/滚动框按钮.png
+              hoverPath: local<->textures/mail/滚动框按钮.png
+              width: '8'
+              height: '20'
+            heightV: 'h*0.088'
+            locationVX: 0.344*h
+            locationVY: '1'
+            invalidV: false
+            scrollableV: auto
+            scrolledV: '0'
+            invalidH: true
+            layout:
+              type: FLOW
+              gapX: '0'
+              gapY: '1'
+            scrollableParts:
+              邮件预览信息:
+                type: canvas
+                enable: true
+                locationZ: '5'
+                locationX: 0.01*h
+                locationY: 0.008*h
+                width: h*0.298
+                height: h*0.088
+                relativeParts:
+                  邮件复选框:
+                    type: checkbox
+                    enable: true
+                    selected: false
+                    interactCooldown: 100
+                    defaultPath: 'local<->textures/mail/邮件列表2.png'
+                    hoverPath: 'local<->textures/mail/邮件列表2.png'
+                    checkedPath: "local<->textures/mail/邮件列表.png"
+                    width: h*0.298
+                    height: h*0.088
+                  邮件图标:
+                    type: item
+                    size: '20'
+                    locationX: 0.044*h
+                    locationY: 0.044*h
+                    itemStack:
+                      ==: org.bukkit.inventory.ItemStack
+                      # 种类会被邮件类型所设置的种类覆盖
+                      type: BOOK
+                  图标纹理:
+                    type: texture
+                    enable: true
+                    path: local<->textures/mail/槽位.png
+                    width: h*0.088
+                    height: h*0.088
+                  标题:
+                    type: label
+                    enable: true
+                    shadow: false
+                    lineSpace: '0'
+                    splitWidth: w*0.4+40
+                    omitWidth: '100'
+                    scale: '1'
+                    texts: []
+                    locationX: 0.09*h
+                    locationY: 0.01*h
+                  发件时间:
+                    type: label
+                    enable: true
+                    shadow: false
+                    lineSpace: '0'
+                    splitWidth: w*0.4+40
+                    omitWidth: '100'
+                    scale: '0.68'
+                    texts: []
+                    locationX: 0.09*h
+                    locationY: 0.064*h
+              
+              

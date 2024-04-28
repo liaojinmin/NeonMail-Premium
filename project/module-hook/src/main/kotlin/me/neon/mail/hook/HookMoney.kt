@@ -20,6 +20,7 @@ class HookMoney: HookPlugin() {
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             Bukkit.getServer().servicesManager.getRegistration(Economy::class.java)?.let {
                 this.economy = it.provider
+                checkHook(it.plugin.name)
             }
         }
         return if (economy != null) this else null

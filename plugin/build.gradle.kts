@@ -8,39 +8,50 @@ val kotlinVersionNum: String
 
 
 dependencies {
+
     implementation(project(":project:module-hook"))
     implementation(project(":project:module-smtp"))
-    implementation(project(":project:module-api"))
-    implementation(project(":project:runtime-bukkit"))
+    implementation(project(":project:common"))
+    implementation(project(":project:common-impl"))
+    implementation(project(":project:module-bukkit"))
+    implementation(project(":project:module-service"))
+    implementation(project(":project:module-template"))
+    implementation(project(":project:module-scheduler"))
+
+    implementation(project(":project:module-screen-germ"))
+    implementation(project(":project:module-screen-vanilla"))
+
 }
 
 
 taboolib {
     description {
         name(rootProject.name)
+        desc("${rootProject.name} 是一个高效的 Minecraft 邮箱插件")
         contributors {
             name("老廖")
+        }
+        dependencies {
+            name("GermPlugin").optional(true)
+            name("GeekEconomy").optional(true)
+            name("PlayerPoints").optional(true)
+            name("placeholderAPI").optional(true)
         }
     }
 
     env {
         enableIsolatedClassloader = false
-
         version {
             coroutines = null
         }
 
     }
+
     // hikari
     relocate("com.zaxxer.hikari", "${rootProject.group}.libraries.zaxxer.hikari")
 
     // redis
     relocate("redis.clients", "${rootProject.group}.libraries.redis.clients")
-
-    // javax
-    relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
-    relocate("com.sun", "${rootProject.group}.libraries.com.sun")
-    relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
 }
 
 tasks {
@@ -50,6 +61,7 @@ tasks {
         // 打包子项目源代码
         rootProject.subprojects.forEach { from(it.sourceSets["main"].output) }
     }
+
 }
 
 gradle.buildFinished {

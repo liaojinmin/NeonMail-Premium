@@ -1,0 +1,20 @@
+title: '&0添加物品'
+layout:
+  - '#########'
+  - '#@@@@@@@#'
+  - '#@@@@@@@#'
+  - '#########'
+  - 'B########'
+
+#
+# @ = 玩家放入的物品，
+#
+icons:
+  B:
+    display:
+      mats: EMERALD
+      name: '&3# &b返回、确认'
+  '#':
+    display:
+      mats: BLACK_STAINED_GLASS_PANE
+      name: '&b&l 挡板'

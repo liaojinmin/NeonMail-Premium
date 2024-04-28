@@ -1,0 +1,45 @@
+
+title: '&0发件箱 %p'
+layout:
+  - '#########'
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - ' @@@@@@@ '
+  - '#########'
+  - '<   D   >'
+
+#
+# 不要修改 "@、D、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '@':
+    display:
+      mats: BOOK #BUNDLE
+      name: '&7主题: &f[title]'
+      model: 0
+      lore:
+        - ''
+        - ' &7发送时间: &f[senderTime]'
+        - ' &7邮件内容:'
+        - ' [text]'
+        - ''
+        - ' &7附件:'
+        - ' &f[item]'
+        - ''
+        - '&8[&B右击&8] &7# 删除记录'
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &7上一页 &f{nowPage}&8/&f{maxPage}'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &7下一页 &f{nowPage}&8/&f{maxPage}'
+  '#':
+    display:
+      mats: BLACK_STAINED_GLASS_PANE
+      name: '&b&l 挡板'
+  'D':
+    display:
+      mats: BARRIER
+      name: '&3# &C删除全部'

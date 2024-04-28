@@ -1,0 +1,28 @@
+title: '&0物品预览'
+layout:
+  - '#########'
+  - '#@@@@@@@#'
+  - '#@@@@@@@#'
+  - '#@@@@@@@#'
+  - '#########'
+  - '<###B###>'
+#
+# 不要修改 "@、B、<、>" 字符，这些字符已内定，如果要增加图标请使用其它字符
+#
+icons:
+  '<':
+    display:
+      mats: 'IRON_DOOR'
+      name: '&3# &7上一页 &f{nowPage}&8/&f{maxPage}'
+  '>':
+    display:
+      mats: IRON_DOOR
+      name: '&3# &7下一页 &f{nowPage}&8/&f{maxPage}'
+  '#':
+    display:
+      mats: BLACK_STAINED_GLASS_PANE
+      name: '&b&l 挡板'
+  'B':
+    display:
+      mats: BARRIER
+      name: '&3# &a返回'
